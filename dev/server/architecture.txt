@@ -1,0 +1,151 @@
+--------------------------
+abstract class Session
+
+	Session throws exception if closed.
+
+   Machine
+
+      Facade
+	MachineInfo 	get_subs_MachineInfo(Callback);
+	void		subs_MachineLoadInfo(Callback);
+
+      Interface
+	bool		update_MachineInfo(MachineInfo);
+	bool		update_MachineLoadInfo(MachineLoadInfo);
+
+   Network
+
+      Facade
+
+	NetworkInfo	get_subs_NetworkInfo (Callback);
+	NetworkLoadInfo	get_subs_NetworkLoadInfo (Callback);
+	vector < NetworkConnectionInfo >
+			get_subs_NetworkConnectionInfo (Callback);
+	vector < NetworkConnectionInfo >
+			get_subs_NetworkConnectionInfo (Callback, UserID);
+	void 		subs_NetworkActivityInfo (Callback);
+	void 		subs_NetworkActivityInfo (Callback, UserID);
+
+      Interface
+
+	bool		update_NetworkInfo (NetworkInfo);
+	bool		update_NetworkLoadInfo (NetworkLoadInfo);
+	bool		update_NetworkConnectionInfo (vector < NetworkConnectionInfo > );
+	bool		update_NetworkActivityInfo (vector < NetworkActivityInfo > );
+
+   User
+
+      Facade
+
+	vector < UserInfo >
+			get_subs_UserInfo (Callback);
+	void 		subs_UserActivityInfo (Callback);
+
+      Interface
+	bool		update_UserInfo (UserInfo);
+	bool		subs_UserActivityInfo (UserActivityInfo);
+
+   Process
+
+      Facade
+
+	vector < ProcessInfo >
+			get_subs_ProcessInfo(Callback);
+	void		subs_ProcessActivityInfo(Callback);
+
+      Interface
+
+	bool		update_ProcessInfo(ProcessInfo);
+	bool		update_ProcessActivityInfo(ProcessActibityInfo);
+
+--------------------------
+class MachineSingleton
+	MachineInfo	get_subs_MachineInfo(Session);
+	MachineLoadInfo	get_subs_MachineLoadInfo(Session);
+
+**** Data Classes
+
+class MachineInfo
+	- bunch of static data about the machine
+
+class MachineLoadInfo
+	float get_5load();
+	float get_10load();
+	float get_15load();
+
+--------------------------
+class NetworkSingleton
+	NetworkInfo	get_subs_NetworkInfo (Session);
+	NetworkLoadInfo	get_subs_NetworkLoadInfo (Session);
+	vector < NetworkConnectionInfo >
+			get_subs_NetworkConnectionInfo (Session);
+	vector < NetworkConnectionInfo >
+			get_subs_NetworkConnectionInfo (Session, UserID);
+	void 		subs_NetworkActivityInfo (Session);
+	void 		subs_NetworkActivityInfo (Session, UserID);
+
+class NetworkConnection
+	- Generates NetworkActivityInfo	objects to be delivered to 
+	subscribed Sessions.
+
+**** Data Classes
+
+class NetworkInfo
+	- network config data
+
+class NetworkLoadInfo
+	- some network stats that would be helpful in 
+	guessing how heavy the network activity is on 
+	this machine
+
+class NetworkConnectionID
+	- Unique identifier for a network connection
+
+class NetworkConnectionInfo
+	- Info for a single connection
+
+class NetworkActivityInfo
+	- an event class which encapsulates the amount
+	and type of activity occuring on a NetworkConnection
+
+-------------------------
+class UserSingleton
+	vector < UserInfo >
+			get_subs_UserInfo (Session);
+	void 		subs_UserActivityInfo (Session);
+
+class User
+
+**** Data Classes
+
+class UserID
+	- Unique identifier for a user
+
+class UserTermID
+	- Unique identifier for a particular terminal
+
+class UserInfo
+	- Information about this user
+	- List of ptys currently logged into
+
+class UserActivityInfo
+	- Activity happened for UserID on UserTermID
+
+-------------------------
+class ProcessSingleton
+	vector < ProcessInfo >
+			get_subs_ProcessInfo(Session);
+	void		subs_ProcessActivityInfo(Session);
+
+class Process
+
+**** Data Classes
+
+class ProcessID
+	- Unique identifier for a Process
+
+class ProcessInfo
+	- Information about this process
+
+class ProcessActivityInfo
+	- Activity happened for ProcessID
