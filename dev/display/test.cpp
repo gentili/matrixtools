@@ -57,8 +57,12 @@ int main (int argc, char * argv[])
 		nanosleep (&ts, NULL);
 		
 	}
-	// Shutdown the screen singleton
-	scr.shutdown();
+
+	// Stop the screen update thread
+	scr.stopUpdates();
+
+	// cleanup the screen
+	scr.cleanup();
 
 	return 0;
 }

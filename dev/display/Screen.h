@@ -3,11 +3,13 @@
 
 // System includes
 #include <ncurses.h>
+#include <vector>
 
 // Foreign includes
 #include "MTObject.h"
 
 // Local includes
+#include "Artifact.h"
 
 /* This class defines a screen in which lines may be put.  It is a 
  singleton (we don't have multiple screens) and grabs the default tty
@@ -16,16 +18,30 @@
 class Screen : public MTObject
 {
 public:
+	//// Singleton Control Functions
+	
 	// Init grabs control of the tty, reads in all the specs,
 	// and generally sets everything up to start updating the display
 	bool init(float updatefreq, void (* charprocfunc) (int));
 
-	void startUpdates() 	{ createThreads(); }
+	// This starts the screen update processing thread
+	bool startUpdates();
 
-	bool shutdown();
+	// This stops the screen update processing thread
+	bool stopUpdates();
 
-	int curs_getch()		{ return curs_getch(); }
+	// This releases the tty
+	bool cleanup();
 
+	//// Artifact Control Functions
+	
+	bool addArtifact(Artifact * newart);
+
+	bool delArtifact(Artifact * oldart);
+
+	bool flushArtifacts();
+
+	//// Attribute control functions
 	void attr_set_red() 	{ _cursattrs = _colortbl[1]; }
 	void attr_set_green() 	{ _cursattrs = _colortbl[2]; }
 	void attr_set_yellow()	{ _cursattrs = _colortbl[3]; }
@@ -60,6 +76,9 @@ protected:
 
 	// Current Screen state
 	static int _cursattrs;
+
+	// Artifact variables
+	static vector<Artifact *> _artifactList;
 
 	// Multithreading jabber
 	static pthread_mutex_t _updatelock;

@@ -16,19 +16,23 @@ WINDOW * Screen::_stdscr = NULL;
 int Screen::_maxy = -1;
 int Screen::_maxx = -1;
 bool Screen::_colors = false;
-
-int Screen::_cursattrs = 0;
 int Screen::_colortbl[8];
 
 float Screen::_updatefreq = 0;
 struct timespec Screen::_updateperiod;
 void * Screen::_charprocfunc = NULL;
 
+int Screen::_cursattrs = 0;
+
+vector<Artifact *> Screen::_artifactList;
+
 pthread_mutex_t Screen::_updatelock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t Screen::_updatecond = PTHREAD_COND_INITIALIZER;
 bool Screen::_workavailable = false;
 
-// Member functions of the Screen singleton
+/////////////////////////////////////
+///// Singleton Control Functions
+/////////////////////////////////////
 
 bool Screen::init(float updatefreq, void (* charprocfunc) (int))
 {
@@ -154,9 +158,18 @@ bool Screen::init(float updatefreq, void (* charprocfunc) (int))
 	return true;
 }
 
-bool Screen::shutdown()
+bool Screen::startUpdates()
 {
-	if (!_inited)
+	if (!_inited || threads() > 0)
+		return false;
+
+	createThreads();
+	return true;
+}
+
+bool Screen::stopUpdates()
+{
+	if (!_inited || (threads() <= 0))
 		return false;
 
 	terminate();
@@ -165,11 +178,60 @@ bool Screen::shutdown()
 		// FIXME: Put a thread safe nanosleep here
 		// or something to stop the useless spinning
 	}
+	return true;
+}
+
 	
+bool Screen::cleanup()
+{
+	if (!_inited || (threads() > 0))
+		return false;
+
 	endwin();
 	_inited = false;
 	return true;
 }
+
+/////////////////////////////////////
+///// Artifact Control Functions
+/////////////////////////////////////
+
+bool Screen::addArtifact (Artifact * newart)
+{
+	if (!_inited || threads() > 0)
+		return false;
+
+	// Add the artifact
+	_artifactList.push(newart);
+	
+	return true;
+}
+
+bool Screen::delArtifact(Artifact * oldart)
+{
+	if (!_inited || threads() > 0)
+		return false;
+
+	// Delete the artifact
+	
+	
+	return true;
+}
+
+bool Screen::flushArtifacts()
+{
+	if (!_inited || threads() > 0)
+		return false;
+
+	// Clear out the entire artifact list
+	
+	return true;
+}
+
+
+/////////////////////////////////////
+///// Main Screen Update Thread
+/////////////////////////////////////
 
 void Screen::run()
 {
