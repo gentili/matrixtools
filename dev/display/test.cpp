@@ -8,6 +8,7 @@ int main (int argc, char * argv[])
 	printf ("Display module test app\n");
 
 	scr.init();
+	sleep (5);
 	scr.shutdown();
 
 	return 0;
