@@ -1,6 +1,10 @@
+// System Includes
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
+#include <math.h>
+
+// Local Includes
 #include "Screen.h"
 #include "MatrixColumn.h"
 
@@ -85,48 +89,94 @@ int main (int argc, char * argv[])
 	}
 	
 	for (int i = 0; i < scr.maxy(); i++)
-		scr.curs_mvaddstr(i, 20, "TEST - Instantanious MCE_Clear");
+		scr.curs_mvaddstr(i, 20, "TEST - Staggered MCE_Delay and MCE_Clear");
 	
 	// Start the screen update thread
 	time_t startime = time(NULL);
 	scr.startUpdates();
 
-	TEST_NSLEEP(1,0);
-	// TEST - MCE_Clear events
+	// TEST - MCE_Delay and MCE_Clear events
 	vector<MatrixColumn *>::iterator MCitr = MClist.begin();
+	int i = 0;
 	while (!exitnow && MCitr != MClist.end())
 	{
-		(*MCitr)->add_clear_event (false, false, false, 0);
+		(*MCitr)->add_delay_event (false, false, false, i);
+		(*MCitr)->add_clear_event (false, false, false);
 		MCitr++;
-		TEST_NSLEEP (0,10000000);
+		i++;
 	}
 	// Give everything time to complete
-	TEST_NSLEEP (1,0);
+	TEST_NSLEEP (3,0);
 
 	// Check that all the event queues are empty
 	MCitr = MClist.begin();
 	while (MCitr != MClist.end())
 	{
 		if ((*MCitr)->eventspending())
-			TEST_ERR_HALT("ERROR: TEST - Instantanious MCE_Clear - Events still pending\n");
+			TEST_ERR_HALT("ERROR: TEST - MCE_Delay and MCE_Clear - Events still pending\n");
 		MCitr++;
 	}
 
-	// TEST - MCE_StringFill
-	/*
+	// TEST - MCE_SetString, MCE_SetAttr and MCE_StringFill
+	MCitr = MClist.begin();
+	i = 0;
+	while (!exitnow && MCitr != MClist.end())
+	{
+		char tmpstr[1024];
+		sprintf (tmpstr, "Set String %02d then Fill                                ",i);
+		(*MCitr)->add_setstring_event (false, false, false, tmpstr);
+		int newattr = scr.curs_attr_red();
+		if (i % 2)
+			newattr |= scr.curs_attr_bold();
+		if (i % 3)
+			newattr |= scr.curs_attr_reverse();
+		(*MCitr)->add_setattr_event (false, false, false, newattr);
+		(*MCitr)->add_stringfill_event (false, false, false);
+		MCitr++;
+		i++;
+	}
+
+	// Give everything time to complete
+	TEST_NSLEEP (2,0);
+
+	// Check that all the event queues are empty
+	MCitr = MClist.begin();
+	while (MCitr != MClist.end())
+	{
+		if ((*MCitr)->eventspending())
+			TEST_ERR_HALT("ERROR: TEST - MCE_SetString and MCE_StringFill - Events still pending\n");
+		MCitr++;
+	}
+	
+	// TEST - MCE_StringDrop
+	MCitr = MClist.begin();
+	float speed = 0;
+	int newattr = scr.curs_attr_green();
+	i = 0;
+	while (!exitnow && MCitr != MClist.end())
+	{
+		(*MCitr)->add_setattr_event (false, false, false, newattr);
+		(*MCitr)->add_clear_event (false, false, false);
+
+		if (i % 2)
+			(*MCitr)->add_stringdrop_event (false, false, false, speed, -1, false, scr.curs_attr_bold() | scr.curs_attr_white());
+		
+		MCitr++;
+		speed += 0.13;
+		if (speed > 1)
+			speed -= floor(speed);
+		i++;
+	}
+
+	// Wait for user input before returning
 	while (!exitnow)
 	{
-		struct timespec ts;
-		ts.tv_sec = 0;
-		ts.tv_nsec = 100000000;
-		nanosleep (&ts, NULL);
-		
+		TEST_NSLEEP(0, 10000000);
 	}
-	*/
 
 	// Stop the screen update thread
-	time_t endtime = time(NULL);
 	scr.stopUpdates();
+	time_t endtime = time(NULL);
 
 	// cleanup the screen
 	scr.cleanup();

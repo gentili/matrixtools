@@ -22,7 +22,6 @@ float Screen::_updatefreq = 0;
 struct timespec Screen::_updateperiod;
 void * Screen::_charprocfunc = NULL;
 
-int Screen::_cursattrs = 0;
 int Screen::_updatecounter = 0;
 
 vector<Artifact *> Screen::_artifactList;

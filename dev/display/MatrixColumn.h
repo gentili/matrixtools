@@ -8,6 +8,10 @@
 // Local Includes
 #include "Screen.h"
 
+// Defines
+
+#define MC_MAX_STR	1024
+
 class MatrixColumn;
 
 class MatrixColumnEvent {
@@ -55,7 +59,12 @@ public:
 
 	//// Class specific interface (user calls)
 	bool eventspending();
-	void add_clear_event(bool override, bool skipable, bool compressable, int duration);
+	void add_delay_event(bool override, bool skipable, bool compressable, int duration);
+	void add_clear_event(bool override, bool skipable, bool compressable);
+	void add_setattr_event(bool override, bool skipable, bool compressable, int newattrs);
+	void add_setstring_event(bool override, bool skipable, bool compressable, char * newstr);
+	void add_stringfill_event(bool override, bool skipable, bool compressable);
+	void add_stringdrop_event(bool override, bool skipable, bool compressable, float speed, int charcount, bool cont, int headcharattr);
 
 protected:
 	//// Internal functions
@@ -67,12 +76,18 @@ protected:
 	//// Config variables
 	// Column this artifact occupies
 	int	_column;
-	// Current String
-	char	_curstr[1024];
+	
+	// Current String Stuff
+	char	_curstr[MC_MAX_STR];
+	int	_curstrlen;
+
+	// Current attributes for writing characters
+	int	_curattrs;
 
 	// Integer part describes which character
 	// of _curstr was last displayed
-	float   _curchar;
+	int	_curchar;
+	float	_curfrac;
 
 	// Current position of cursor in column
 	int	_curpos;
@@ -81,16 +96,38 @@ protected:
 	pthread_mutex_t	 _equeue_lock;	// Event queue access lock
 	deque<MatrixColumnEvent *> _equeue;	// Event queue
 
+	friend class MCE_Delay;
 	friend class MCE_Clear;
+	friend class MCE_SetAttr;
+	friend class MCE_SetString;
+	friend class MCE_StringFill;
+	friend class MCE_StringDrop;
 };
 
-// This guy can be set both skipable and/or compressable
+class MCE_Delay : public MatrixColumnEvent {
+public:
+	MCE_Delay(int duration);
+
+	virtual ~MCE_Delay() 	{ return; }
+
+	virtual bool render(MatrixColumn * mc, Screen * curscr);
+
+	virtual void compress(MatrixColumn * mc, Screen * curscr)
+				{ return; }
+
+protected:
+	// How long the empty column should persist before
+	// doing anything else
+	int	_duration;
+	
+	// The number of the last cycle this event was at the top
+	// of the queue for; -1 means it's never been rendered
+	int	_lastcycle;
+};
+
 class MCE_Clear : public MatrixColumnEvent {
 public:
-	MCE_Clear(int duration) 
-		{ _duration = duration; 
-		  _lastcycle = -1;
-		  return; }
+	MCE_Clear() { return; }
 
 	virtual ~MCE_Clear() { return; }
 
@@ -101,13 +138,70 @@ public:
 protected:
 	void doclear(MatrixColumn * mc, Screen * curscr);
 	
-	// How long the empty column should persist before
-	// doing anything else
-	int	_duration;
-	
-	// The number of the last cycle this event was at the top
-	// of the queue for; -1 means it's never been rendered
-	int	_lastcycle;
 };
 
+class MCE_SetAttr : public MatrixColumnEvent {
+public:
+	MCE_SetAttr(int newattr);
+
+	virtual ~MCE_SetAttr() { return; }
+
+	virtual bool render(MatrixColumn * mc, Screen * curscr);
+	
+	virtual void compress(MatrixColumn * mc, Screen * curscr);
+
+protected:
+	int	_newattr;
+	
+};
+
+class MCE_SetString : public MatrixColumnEvent {
+public:
+	MCE_SetString(char * newstr);
+
+	virtual ~MCE_SetString() { return; }
+
+	virtual bool render(MatrixColumn * mc, Screen * curscr);
+	
+	virtual void compress(MatrixColumn * mc, Screen * curscr);
+
+protected:
+
+	// The new string to set
+	char _newstr[MC_MAX_STR];
+};
+
+class MCE_StringFill : public MatrixColumnEvent {
+public:
+	MCE_StringFill() { return; }
+
+	virtual ~MCE_StringFill() { return; }
+
+	virtual bool render(MatrixColumn * mc, Screen * curscr);
+	
+	virtual void compress(MatrixColumn * mc, Screen * curscr);
+
+protected:
+
+	void dofill(MatrixColumn * mc, Screen * curscr);
+};
+
+class MCE_StringDrop : public MatrixColumnEvent {
+public:
+	// How quickly to drop, number of characters to drop before
+	// completion, whether to continue from previous drop,
+	// and what the attributes of the head character should be
+	MCE_StringDrop(float speed, int charcount, bool cont, int headchardrop);
+
+	virtual ~MCE_StringDrop() { return; }
+	
+	virtual bool render(MatrixColumn * mc, Screen * curscr);
+
+	virtual void compress(MatrixColumn * mc, Screen * curscr);
+protected:
+	float	_speed;
+	int	_charcount;
+	bool	_cont;
+	int	_headcharattr;
+};
 #endif

@@ -63,17 +63,19 @@ public:
 	bool flushArtifacts();
 
 	//// Attribute control functions
-	void attr_set_red() 	{ _cursattrs = _colortbl[1]; }
-	void attr_set_green() 	{ _cursattrs = _colortbl[2]; }
-	void attr_set_yellow()	{ _cursattrs = _colortbl[3]; }
-	void attr_set_blue()	{ _cursattrs = _colortbl[4]; }
-	void attr_set_magenta()	{ _cursattrs = _colortbl[5]; }
-	void attr_set_cyan()	{ _cursattrs = _colortbl[6]; }
-	void attr_set_white()	{ _cursattrs = _colortbl[7]; }
+	int curs_attr_red() 	{ return _colortbl[1]; }
+	int curs_attr_green() 	{ return _colortbl[2]; }
+	int curs_attr_yellow()	{ return _colortbl[3]; }
+	int curs_attr_blue()	{ return _colortbl[4]; }
+	int curs_attr_magenta()	{ return _colortbl[5]; }
+	int curs_attr_cyan()	{ return _colortbl[6]; }
+	int curs_attr_white()	{ return _colortbl[7]; }
 
-	void attr_on_bold()	{ _cursattrs |= A_BOLD; }
+	int curs_attr_bold()	{ return A_BOLD; }
+	int curs_attr_reverse()	{ return A_REVERSE; }
 
-	void attr_register()	{ attrset( _cursattrs ); }
+	void curs_attr_set(int newattr)
+				{ wattrset( _stdscr, newattr ); }
 
 	//// Cursor control functions
 	void curs_move(int y, int x)	{ wmove(_stdscr, y, x); }
@@ -82,6 +84,8 @@ public:
 					{ mvwaddch(_stdscr, y, x, ch); }
 	void curs_mvaddstr(int y, int x, char * str)
 					{ mvwaddstr(_stdscr, y, x, str); }
+	void curs_mvchgat(int y, int x, int n, int newattr)
+					{ mvwchgat(_stdscr, y, x, n, (attr_t) newattr, 0, NULL); }
 
 	//// Member accessors
 	int maxy() 		{ return _maxy; }
@@ -109,7 +113,6 @@ protected:
 	static void * _charprocfunc;
 
 	// Current Screen state
-	static int _cursattrs;
 	static int _updatecounter;
 
 	// Artifact variables
