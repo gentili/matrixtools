@@ -24,7 +24,7 @@ void * Screen::_charprocfunc = NULL;
 
 int Screen::_updatecounter = 0;
 
-vector<Artifact *> Screen::_artifactList;
+std::vector<Artifact *> Screen::_artifactList;
 
 pthread_mutex_t Screen::_updatelock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t Screen::_updatecond = PTHREAD_COND_INITIALIZER;
@@ -215,7 +215,7 @@ bool Screen::delArtifact(Artifact * oldart)
 		return false;
 
 	// Delete the artifact
-	static vector<Artifact *>::iterator aitr = 
+	std::vector<Artifact *>::iterator aitr = 
 		find (_artifactList.begin(),
 				_artifactList.end(),
 				oldart);
@@ -305,7 +305,7 @@ void Screen::run()
 
 		// Go through the artifact list and do any work
 		// that's available in this update
-		for (vector<Artifact *>::iterator Aitr = _artifactList.begin();
+		for (std::vector<Artifact *>::iterator Aitr = _artifactList.begin();
 				Aitr != _artifactList.end();
 				Aitr++)
 		{

@@ -94,7 +94,7 @@ protected:
 	
 	// Event Queue Stuff
 	pthread_mutex_t	 _equeue_lock;	// Event queue access lock
-	deque<MatrixColumnEvent *> _equeue;	// Event queue
+	std::deque<MatrixColumnEvent *> _equeue;	// Event queue
 
 	friend class MCE_Delay;
 	friend class MCE_Clear;

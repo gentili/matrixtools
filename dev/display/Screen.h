@@ -3,8 +3,8 @@
 
 // System includes
 #include <ncurses.h>
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 // Foreign includes
 #include "MTObject.h"
@@ -116,7 +116,7 @@ protected:
 	static int _updatecounter;
 
 	// Artifact variables
-	static vector<Artifact *> _artifactList;
+	static std::vector<Artifact *> _artifactList;
 
 	// Multithreading jabber
 	static pthread_mutex_t _updatelock;

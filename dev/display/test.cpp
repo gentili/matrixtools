@@ -80,7 +80,7 @@ int main (int argc, char * argv[])
 	//////////////////////////////
 	
 	// Set up a screen full of Matrix Columns
-	vector<MatrixColumn *> MClist;
+	std::vector<MatrixColumn *> MClist;
 	for (int i = 0; i < scr.maxx(); i++)
 	{
 		MatrixColumn * newmcol = new MatrixColumn(i);
@@ -96,7 +96,7 @@ int main (int argc, char * argv[])
 	scr.startUpdates();
 
 	// TEST - MCE_Delay and MCE_Clear events
-	vector<MatrixColumn *>::iterator MCitr = MClist.begin();
+	std::vector<MatrixColumn *>::iterator MCitr = MClist.begin();
 	int i = 0;
 	while (!exitnow && MCitr != MClist.end())
 	{
