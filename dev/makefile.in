@@ -12,7 +12,7 @@ clean:
 	@echo " "
 	@echo "*** cleaning ***"
 	@echo " "
-	rm $(ALL_TARGETS); rm *.o
+	-rm -f $(ALL_TARGETS); rm -f *.o
 
 %.o : %.cpp
 	$(CXX) -c $(OFLAGS) $(CFLAGS) $(INCDIRS) $< -o $@

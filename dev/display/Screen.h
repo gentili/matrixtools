@@ -1,7 +1,13 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
+// System includes
+#include <ncurses.h>
+
+// Foreign includes
 #include "MTObject.h"
+
+// Local includes
 
 /* This class defines a screen in which lines may be put.  It is a 
  singleton (we don't have multiple screens) and grabs the default tty
@@ -22,6 +28,10 @@ protected:
 
 	// This describes if the screen has been inited yet
 	static bool _inited;
+	static WINDOW * _stdscr;
+	static int _maxy;
+	static int _maxx;
+	static bool _colors;
 
 private:
 };
