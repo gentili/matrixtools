@@ -14,6 +14,12 @@
 class Session 
 {
 public:
+   // Control
+	Session() { _active = true; }
+	virtual void deactivate() { _active = false; }
+	virtual bool active() { return _active; }
+	virtual ~Session() { };
+
    // Machine
 	virtual bool		update_MachineInfo(MachineInfo&) = 0;
 	virtual bool		update_MachineLoadInfo(MachineLoadInfo&) = 0;
@@ -31,6 +37,10 @@ public:
    // Process
 	virtual bool		update_ProcessInfo(ProcessInfo &) = 0;
 	virtual bool		update_ProcessActivityInfo(ProcessActivityInfo &) = 0;
+
+private:
+   // Control
+	bool _active;
 };
 
 #endif

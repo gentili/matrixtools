@@ -5,11 +5,21 @@
 // Local includes 
 #include "MachineSingleton.h"
 
-// Static members
+//// Static members
 
+// Control
 bool MachineSingleton::_running = false;
 bool MachineSingleton::_shutdown = false;
 bool MachineSingleton::_MachineLoadMonitor_running = false;
+vector<Ref<Session>*> MachineSingleton::_MachineLoadMonitor_subscribers;
+
+// Data
+MachineInfo MachineSingleton::_curMI;
+MachineLoadInfo MachineSingleton::_curMLI;
+
+// Sync
+pthread_mutex_t MachineSingleton::_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t MachineSingleton::_cond = PTHREAD_COND_INITIALIZER;
 
 // Object state & control
 
@@ -82,6 +92,17 @@ void * MachineSingleton::MachineLoadMonitor(void * arg)
 		wait.tv_sec = 1;
 		wait.tv_nsec = 0;
 		nanosleep (&wait, NULL);
+
+		// Go through the subscription list
+		pthread_mutex_lock (&_lock);
+		for (vector<Ref<Session>*>::iterator sitr = _MachineLoadMonitor_subscribers.begin();
+				sitr != _MachineLoadMonitor_subscribers.end();
+				sitr++)
+		{
+			// Send an update if there's been a change
+			(**sitr)->update_MachineLoadInfo(_curMLI);
+		}
+		pthread_mutex_unlock (&_lock);
 	}
 	
 	// Signal that we're done
@@ -93,12 +114,39 @@ void * MachineSingleton::MachineLoadMonitor(void * arg)
 
 MachineInfo MachineSingleton::get_subs_MachineInfo(Ref<Session> & sessionref)
 {
-	MachineInfo mi;
-	return mi;
+	if (!_running)
+		throw MSE_shutdown();
+
+	pthread_mutex_lock (&_lock);
+	// Currently, the machineinfo doesn't change, so there's no
+	// actual subscription that needs to take place.
+
+	MachineInfo tempMI = _curMI;
+	
+	pthread_mutex_unlock (&_lock);
+
+	return tempMI;
 }
 
+// NOTE: A subscriber may receive an update before these subscription
+// functions return, so they should be ready for that.
 MachineLoadInfo MachineSingleton::get_subs_MachineLoadInfo(Ref<Session> & sessionref)
 {
-	MachineLoadInfo mli;
-	return mli;
+	if (!_running)
+		throw MSE_shutdown();
+
+	// OK, we need to create a new ref and put it on the
+	// MLI subscription list
+	Ref<Session> * newsessionref = new Ref<Session> (sessionref);
+
+	pthread_mutex_lock (&_lock);
+
+	_MachineLoadMonitor_subscribers.push_back(newsessionref);
+	
+	// Now return the current load
+	MachineLoadInfo tempMLI;
+	
+	pthread_mutex_unlock (&_lock);
+	
+	return tempMLI;
 }

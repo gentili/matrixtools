@@ -12,7 +12,7 @@
 class TestSession : public Session
 {
 public:
-	TestSession() { _active = true; }
+	virtual ~TestSession() { printf ("~Session()\n"); }
 
    // Machine
 	virtual bool		update_MachineInfo(MachineInfo&);
@@ -52,6 +52,7 @@ bool TestSession::update_MachineInfo(MachineInfo & newMinfo)
 
 bool TestSession::update_MachineLoadInfo(MachineLoadInfo & newMLinfo)
 {
+	printf ("update_MachineLoadInfo() - got update!\n");
 	return _active;
 }
 
@@ -61,8 +62,8 @@ bool TestSession::update_MachineLoadInfo(MachineLoadInfo & newMLinfo)
 
 int main(int argc, char * argv[])
 {
-	TestSession * ts = new TestSession();
-	Ref<TestSession> * tsr = new Ref<TestSession> (ts);
+	Session * ts = new TestSession();
+	Ref<Session> * tsr = new Ref<Session> (ts);
 
 	printf ("main() - Starting MachineSingleton\n");
 	if (!MachineSingleton::startup())
@@ -70,6 +71,9 @@ int main(int argc, char * argv[])
 		printf ("ABORT: Unable to start MachineSingleton\n");
 		return -1;
 	}
+
+	printf ("main() - Subscribing to MachineLoadInfo updates\n");
+	MachineSingleton::get_subs_MachineLoadInfo(*tsr);
 
 	printf ("main() - Sleeping 10 seconds\n");
 	struct timespec wait;
