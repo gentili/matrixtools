@@ -10,6 +10,8 @@ ALL_TARGETS= libdisplay.a test
 include ../makefile.in
 # -----------------------
 
+CFLAGS += -DDEBUG
+
 OFILES =	Screen.o
 
 libdisplay.a: $(OFILES)
