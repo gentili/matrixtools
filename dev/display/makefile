@@ -12,7 +12,7 @@ include ../makefile.in
 
 CFLAGS += -DDEBUG
 
-OFILES =	Screen.o
+OFILES =	Screen.o FullColumn.o
 
 libdisplay.a: $(OFILES)
 	ar vr $@ $^

@@ -214,7 +214,7 @@ void Screen::run()
 			if (++updatecounter > 10000)
 				updatecounter = 0;
 #ifdef DEBUG
-			move (24,0);
+			move (_maxy-1,0);
 			sprintf (dbgstr,"%d",updatecounter);
 			addstr (dbgstr);
 #endif 
