@@ -28,6 +28,10 @@ public:
 
 	// Do all 
 	virtual void compress(MatrixColumn * mc, Screen * curscr) = 0;
+
+	// Reset the event to its original state
+	// (as if it had never been run)
+	virtual void reset() = 0;
 	
 	// If an event is skipable, then we simply 
 	// discard it when another event shows up in
@@ -58,6 +62,15 @@ public:
 	virtual void render(Screen * curscr);
 
 	//// Class specific interface (user calls)
+	
+	// Script manipulators
+	
+	void add_multitone_stringdrop_script(std::vector<float> & speeds,
+			std::vector<int> & counts,
+			std::vector<int> & headattrs,
+			std::vector<int> & colattrs);
+
+	// Event manipulators
 	bool eventspending();
 	void add_delay_event(bool override, bool skipable, bool compressable, int duration);
 	void add_clear_event(bool override, bool skipable, bool compressable);
@@ -102,6 +115,7 @@ protected:
 	friend class MCE_SetString;
 	friend class MCE_StringFill;
 	friend class MCE_StringDrop;
+	friend class MCE_RepScript;
 };
 
 class MCE_Delay : public MatrixColumnEvent {
@@ -114,6 +128,8 @@ public:
 
 	virtual void compress(MatrixColumn * mc, Screen * curscr)
 				{ return; }
+
+	virtual void reset()	{ _lastcycle = -1; }
 
 protected:
 	// How long the empty column should persist before
@@ -135,6 +151,8 @@ public:
 	
 	virtual void compress(MatrixColumn * mc, Screen * curscr);
 
+	virtual void reset() { return; }
+
 protected:
 	void doclear(MatrixColumn * mc, Screen * curscr);
 	
@@ -149,6 +167,8 @@ public:
 	virtual bool render(MatrixColumn * mc, Screen * curscr);
 	
 	virtual void compress(MatrixColumn * mc, Screen * curscr);
+
+	virtual void reset() { return; }
 
 protected:
 	int	_newattr;
@@ -165,6 +185,8 @@ public:
 	
 	virtual void compress(MatrixColumn * mc, Screen * curscr);
 
+	virtual void reset() { return; }
+
 protected:
 
 	// The new string to set
@@ -180,6 +202,8 @@ public:
 	virtual bool render(MatrixColumn * mc, Screen * curscr);
 	
 	virtual void compress(MatrixColumn * mc, Screen * curscr);
+
+	virtual void reset() { return; }
 
 protected:
 
@@ -198,10 +222,34 @@ public:
 	virtual bool render(MatrixColumn * mc, Screen * curscr);
 
 	virtual void compress(MatrixColumn * mc, Screen * curscr);
+
+	virtual void reset();
 protected:
 	float	_speed;
 	int	_charcount;
+	int	_orig_charcount;
 	bool	_cont;
+	bool	_orig_cont;
 	int	_headcharattr;
+};
+
+class MCE_RepScript : public MatrixColumnEvent {
+public:
+	MCE_RepScript(std::vector<MatrixColumnEvent *> & eventlist);
+
+	virtual ~MCE_RepScript();
+
+	virtual bool render(MatrixColumn * mc, Screen * curscr);
+	
+	virtual void compress(MatrixColumn * mc, Screen * curscr)
+				{ return; }
+
+	virtual void reset();
+
+protected:
+
+	std::vector<MatrixColumnEvent *> _eventlist;
+	std::vector<MatrixColumnEvent *>::iterator _curevent;
+
 };
 #endif

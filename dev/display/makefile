@@ -6,7 +6,7 @@ LIBDIRS=	-L../utility -L.
 INCDIRS=	-I../utility
 
 # -----------------------
-ALL_TARGETS= libdisplay.a test drop
+ALL_TARGETS= libdisplay.a test droptest reptest
 include ../makefile.in
 # -----------------------
 
@@ -21,5 +21,8 @@ libdisplay.a: $(OFILES)
 test: libdisplay.a test.o
 	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
 
-drop: libdisplay.a drop.o
+droptest: libdisplay.a droptest.o
+	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
+
+reptest: libdisplay.a reptest.o
 	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)

@@ -85,6 +85,45 @@ bool MatrixColumn::eventspending()
 	return retval;
 }
 
+//// Functions to add repeating event scripts to the matrix column event queue
+
+// This produces a repeating script
+void MatrixColumn::add_multitone_stringdrop_script(std::vector<float> & speeds, 
+		std::vector<int> & counts, 
+		std::vector<int> & headattrs,
+		std::vector<int> & colattrs)
+{
+	if ((headattrs.size() != colattrs.size()) ||
+			(headattrs.size() != counts.size()) ||
+			(headattrs.size() != speeds.size()))
+		throw;
+
+	std::vector<MatrixColumnEvent *> eventlist;
+	for (int i = 0; i < (int) counts.size(); i++)
+	{
+		// Put in SA event
+		MCE_SetAttr * newsa = new MCE_SetAttr(colattrs[i]);
+		newsa->_skipable = false;
+		newsa->_compressable = false;
+		eventlist.push_back(newsa);
+		
+		// Put in SD event
+		MCE_StringDrop * newsd = new MCE_StringDrop
+			(speeds[i], 
+			 counts[i], 
+			 true,
+			 headattrs[i]);
+		newsd->_skipable = false;
+		newsd->_compressable = false;
+		eventlist.push_back(newsd);
+	}
+	MCE_RepScript * newe = new MCE_RepScript(eventlist);
+	newe->_skipable = true;
+	newe->_compressable = false;
+
+	add_event(newe);
+}
+
 //// Functions to add new events to the matrixcolumn event queue
 
 void MatrixColumn::add_delay_event(bool override, bool skipable, bool compressable, int duration)
@@ -331,8 +370,8 @@ void MCE_StringFill::dofill(MatrixColumn * mc, Screen * curscr)
 MCE_StringDrop::MCE_StringDrop(float speed, int charcount, bool cont, int headcharattr)
 {
 	_speed = speed;
-	_charcount = charcount;
-	_cont = cont;
+	_orig_charcount = _charcount = charcount;
+	_orig_cont = _cont = cont;
 	_headcharattr = headcharattr;
 }
 
@@ -394,4 +433,66 @@ bool MCE_StringDrop::render(MatrixColumn * mc, Screen * curscr)
 
 void MCE_StringDrop::compress(MatrixColumn * mc, Screen * curscr)
 {
+	// FIXME: Need to fill this in!
+}
+
+void MCE_StringDrop::reset()
+{
+	// Need to reset all vars that can change
+	// during operation
+	
+	_cont = _orig_cont;
+	_charcount = _orig_charcount;
+}
+
+//// MCE_RepScript
+
+MCE_RepScript::MCE_RepScript (std::vector<MatrixColumnEvent *> & eventlist)
+{
+	_eventlist = eventlist;
+	_curevent = _eventlist.begin();
+}
+
+MCE_RepScript::~MCE_RepScript()
+{
+	// Must cycle through the event list and
+	// blow away all the events
+	
+	for (_curevent = _eventlist.begin();
+			_curevent != _eventlist.end();
+			_curevent++)
+	{
+		delete (*_curevent);
+	}
+}
+
+bool MCE_RepScript::render(MatrixColumn * mc, Screen * curscr)
+{
+#ifdef DEBUG
+	// This is a repscript
+	curscr->curs_mvaddch(curscr->maxy()-5,mc->_column,'R');
+	char ch = '0';
+	ch += (_eventlist.size() % 10);
+	curscr->curs_mvaddch(curscr->maxy()-4, mc->_column, ch);
+#endif
+	bool terminate = false;
+	while (!terminate)
+	{
+		terminate = (*_curevent)->render(mc, curscr);
+		if (!terminate)
+		{
+			_curevent++;
+			if (_curevent == _eventlist.end())
+			{
+				_curevent = _eventlist.begin();
+			}
+			(*_curevent)->reset();
+		}
+	}
+	return true;
+}
+
+void MCE_RepScript::reset()
+{
+	// FIXME: Fill this in!
 }
