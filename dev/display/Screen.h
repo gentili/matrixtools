@@ -21,6 +21,15 @@ public:
 	bool init();
 
 	bool shutdown();
+
+	void set_white();
+	void set_red();
+	void set_green();
+	void set_yellow();
+	void set_blue();
+	void set_magenta();
+	void set_cyan();
+	void set_black();
 	
 protected:
 	// This is the main update thread

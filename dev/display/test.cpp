@@ -7,7 +7,11 @@ int main (int argc, char * argv[])
 	Screen scr;
 	printf ("Display module test app\n");
 
-	scr.init();
+	if (!scr.init())
+	{
+		printf ("Unable to initialize display terminal!\n");
+		exit (1);
+	}
 	sleep (5);
 	scr.shutdown();
 
