@@ -75,6 +75,7 @@ public:
 	void add_delay_event(bool override, bool skipable, bool compressable, int duration);
 	void add_clear_event(bool override, bool skipable, bool compressable);
 	void add_setattr_event(bool override, bool skipable, bool compressable, int newattrs);
+	void add_setattr_event(bool override, bool skipable, bool compressable, std::vector<int> & newattrvec);
 	void add_setstring_event(bool override, bool skipable, bool compressable, char * newstr);
 	void add_stringfill_event(bool override, bool skipable, bool compressable);
 	void add_stringdrop_event(bool override, bool skipable, bool compressable, float speed, int charcount, bool cont, int headcharattr);
@@ -96,6 +97,7 @@ protected:
 
 	// Current attributes for writing characters
 	int	_curattrs;
+	std::vector<int> _curattrvec;
 
 	// Integer part describes which character
 	// of _curstr was last displayed
@@ -161,6 +163,7 @@ protected:
 class MCE_SetAttr : public MatrixColumnEvent {
 public:
 	MCE_SetAttr(int newattr);
+	MCE_SetAttr(std::vector<int> & newattrvec);
 
 	virtual ~MCE_SetAttr() { return; }
 
@@ -172,6 +175,7 @@ public:
 
 protected:
 	int	_newattr;
+	std::vector<int> _newattrvec;
 	
 };
 

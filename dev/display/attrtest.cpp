@@ -69,85 +69,50 @@ int main (int argc, char * argv[])
 		printf ("ERROR: Unable to initialize display terminal\n");
 		exit (1);
 	}
-	// Check that term meets minimum reqs for testing
-	if ((scr.maxx() < 80) || (scr.maxy() < 25))
-	{
-		TEST_ERR_HALT ("ERROR: terminal must be at least 80 columns by 25 rows\n");
-	}
 
 	//////////////////////////////
-	// Start Matrix Column Testing
+	// Set up matrix columns
 	//////////////////////////////
 	
 	// Set up a screen full of Matrix Columns
 	std::vector<MatrixColumn *> MClist;
-	for (int i = 0; i < scr.maxx(); i++)
+	int i;
+	for (i = 0; i < scr.maxx(); i++)
 	{
 		MatrixColumn * newmcol = new MatrixColumn(i);
 		scr.addArtifact(newmcol);
 		MClist.push_back(newmcol);
 	}
 	
-	for (int i = 0; i < scr.maxy(); i++)
-		scr.curs_mvaddstr(i, 20, "TEST - Staggered MCE_Delay and MCE_Clear");
-	
 	// Start the screen update thread
-	time_t startime = time(NULL);
 	scr.startUpdates();
 
-	// TEST - MCE_Delay and MCE_Clear events
+	// TEST - MCE_StringDrop
 	std::vector<MatrixColumn *>::iterator MCitr = MClist.begin();
-	int i = 0;
-	while (!exitnow && MCitr != MClist.end())
-	{
-		(*MCitr)->add_delay_event (false, false, false, i);
-		(*MCitr)->add_clear_event (false, false, false);
-		MCitr++;
-		i++;
-	}
-	// Give everything time to complete
-	TEST_NSLEEP (3,0);
-
-	// Check that all the event queues are empty
-	MCitr = MClist.begin();
-	while (MCitr != MClist.end())
-	{
-		if ((*MCitr)->eventspending())
-			TEST_ERR_HALT("ERROR: TEST - MCE_Delay and MCE_Clear - Events still pending\n");
-		MCitr++;
-	}
-
-	// TEST - MCE_SetString, MCE_SetAttr and MCE_StringFill
-	MCitr = MClist.begin();
+	float speed = 0;
+	std::vector<int> newattr;
+	newattr.insert(newattr.end(),scr.maxy()/2, scr.curs_attr_red());
+	newattr.insert(newattr.end(),scr.maxy()/2+1, scr.curs_attr_green());
+	
 	i = 0;
 	while (!exitnow && MCitr != MClist.end())
 	{
 		char tmpstr[1024];
 		sprintf (tmpstr, "Set String %02d then Fill                                ",i);
 		(*MCitr)->add_setstring_event (false, false, false, tmpstr);
-		int newattr = scr.curs_attr_red();
-		if (i % 2)
-			newattr |= scr.curs_attr_bold();
-		if (i % 3)
-			newattr |= scr.curs_attr_reverse();
 		(*MCitr)->add_setattr_event (false, false, false, newattr);
-		(*MCitr)->add_stringfill_event (false, false, false);
+		(*MCitr)->add_clear_event (false, false, false);
+
+		if (i % 2)
+			(*MCitr)->add_stringdrop_event (false, false, false, speed, -1, false, scr.curs_attr_bold() | scr.curs_attr_white());
+		
 		MCitr++;
+		speed += 0.13;
+		if (speed > 1)
+			speed -= floor(speed);
 		i++;
 	}
 
-	// Give everything time to complete
-	TEST_NSLEEP (2,0);
-
-	// Check that all the event queues are empty
-	MCitr = MClist.begin();
-	while (MCitr != MClist.end())
-	{
-		if ((*MCitr)->eventspending())
-			TEST_ERR_HALT("ERROR: TEST - MCE_SetString and MCE_StringFill - Events still pending\n");
-		MCitr++;
-	}
-	
 	// Wait for user input before returning
 	while (!exitnow)
 	{
@@ -156,16 +121,9 @@ int main (int argc, char * argv[])
 
 	// Stop the screen update thread
 	scr.stopUpdates();
-	time_t endtime = time(NULL);
 
 	// cleanup the screen
 	scr.cleanup();
 
-	// Now output the number of the last cycle
-	
-	printf ("Total Cycles: %d\n", scr.updatecounter());
-	printf ("Avg Cycles/s: %f\n", (float) scr.updatecounter() / 
-			(float) (endtime - startime));
-	printf ("All tests PASSED\n");
 	return 0;
 }

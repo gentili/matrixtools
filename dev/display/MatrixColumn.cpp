@@ -168,6 +168,20 @@ void MatrixColumn::add_setattr_event(bool override, bool skipable, bool compress
 	}
 }
 
+void MatrixColumn::add_setattr_event(bool override, bool skipable, bool compressable, std::vector<int> & newattrvec)
+{
+	MCE_SetAttr * newe = new MCE_SetAttr(newattrvec);
+	newe->_skipable = skipable;
+	newe->_compressable = compressable; // Meaningless for this event
+
+	if (override)
+	{
+		override_event(newe);
+	} else {
+		add_event(newe);
+	}
+}
+
 void MatrixColumn::add_setstring_event(bool override, bool skipable, bool compressable, char * newstr)
 {
 	MCE_SetString * newe = new MCE_SetString(newstr);
@@ -300,15 +314,22 @@ MCE_SetAttr::MCE_SetAttr(int newattr)
 	_newattr = newattr;
 }
 
+MCE_SetAttr::MCE_SetAttr(std::vector<int> & newattrvec)
+{
+	_newattrvec = newattrvec;
+}
+
 bool MCE_SetAttr::render(MatrixColumn * mc, Screen * curscr)
 {
 	mc->_curattrs = _newattr;
+	mc->_curattrvec = _newattrvec;
 	return false;
 }
 
 void MCE_SetAttr::compress(MatrixColumn * mc, Screen * curscr)
 {
 	mc->_curattrs = _newattr;
+	mc->_curattrvec = _newattrvec;
 }
 
 //// MCE_SetString
@@ -401,7 +422,18 @@ bool MCE_StringDrop::render(MatrixColumn * mc, Screen * curscr)
 		// and switch it to normal colour
 		if (mc->_curpos >= 0)
 		{
-			curscr->curs_attr_set(mc->_curattrs);
+			// If the attribute vector is filled in
+			// then we need to use the appropriate
+			// attr for this row, otherwise just use
+			// the global attribute
+			if (mc->_curattrvec.empty())
+			{
+				curscr->curs_attr_set(mc->_curattrs);
+			} else
+			{
+				assert ((int) mc->_curattrvec.size() > mc->_curpos);
+				curscr->curs_attr_set(mc->_curattrvec[mc->_curpos]);
+			}
 			curscr->curs_mvaddch(mc->_curpos,
 					mc->_column,
 					mc->_curstr[mc->_curchar]);
