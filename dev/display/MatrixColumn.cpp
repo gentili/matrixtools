@@ -3,7 +3,6 @@
 
 // Local includes
 #include "MatrixColumn.h"
-#include "Screen.h"
 
 // Default constructor
 

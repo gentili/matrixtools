@@ -5,8 +5,7 @@
 #include <deque>
 
 // Local Includes
-
-#include "Artifact.h"
+#include "Screen.h"
 
 class MatrixColumnEvent {
 public:

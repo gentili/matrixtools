@@ -10,7 +10,20 @@
 #include "MTObject.h"
 
 // Local includes
-#include "Artifact.h"
+
+class Screen;
+
+/* This class is an abstract base class that represents some artifact
+to be rendered by the Screen class */
+
+class Artifact {
+public:
+	// Destructor
+	virtual ~Artifact() { return; }
+
+	// Rendering function
+	virtual void render(Screen * curscr) = 0;
+};
 
 /* This class defines a screen in which lines may be put.  It is a 
  singleton (we don't have multiple screens) and grabs the default tty
