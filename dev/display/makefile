@@ -1,5 +1,7 @@
 
-LIBS=	-lncurses
+LIBS=	-lncurses -lutility
+
+LIBDIRS=	-L../utility
 
 CFLAGS=	-Wall -g
 
@@ -10,7 +12,7 @@ REQOBJS=
 all: $(REQOBJS) test
 
 test: $(REQOBJS) test.o
-	$(CXX) -o $@ $(CFLAGS) $^ $(LIBS)
+	$(CXX) -o $@ $(CFLAGS) $^ $(LIBDIRS) $(LIBS)
 
 clean:
 	rm -f *.o test
