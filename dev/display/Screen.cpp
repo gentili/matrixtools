@@ -23,6 +23,7 @@ struct timespec Screen::_updateperiod;
 void * Screen::_charprocfunc = NULL;
 
 int Screen::_cursattrs = 0;
+int Screen::_updatecounter = 0;
 
 vector<Artifact *> Screen::_artifactList;
 
@@ -66,6 +67,7 @@ bool Screen::init(float updatefreq, void (* charprocfunc) (int))
 	if (leaveok(_stdscr, true) == ERR)  // Leave cursor in place after update
 		return false;
 	timeout(0); // Because nodelay() doesn't work
+	curs_set(0); // Make the cursor invisible
 
 	// Initialize terminal info
 	getmaxyx (_stdscr, _maxy, _maxx);
@@ -252,7 +254,7 @@ void Screen::run()
 	// updating and refreshing the screen.  This should 
 	// run a maximum of _updatefreq times a second
 	
-	unsigned int updatecounter = 0;
+	_updatecounter = 0;
 	struct timeval start;
 	struct timeval now;
 	struct timespec due;
@@ -287,11 +289,11 @@ void Screen::run()
 			}
 
 			// Update the counter
-			if (++updatecounter > 10000)
-				updatecounter = 0;
+			if (++_updatecounter >= MAX_SCREEN_CYCLE)
+				_updatecounter = 0;
 #ifdef DEBUG
 			move (_maxy-1,0);
-			sprintf (dbgstr,"%d",updatecounter);
+			sprintf (dbgstr,"%d",_updatecounter);
 			addstr (dbgstr);
 #endif 
 			// fire off the refresh

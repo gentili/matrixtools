@@ -11,6 +11,13 @@
 
 // Local includes
 
+// Defines
+#define MAX_SCREEN_CYCLE	10000
+
+#define DIFF_CYCLE(start, end) ( \
+	((end - start + MAX_SCREEN_CYCLE) % MAX_SCREEN_CYCLE) \
+)
+
 class Screen;
 
 /* This class is an abstract base class that represents some artifact
@@ -71,10 +78,15 @@ public:
 	//// Cursor control functions
 	void curs_move(int y, int x)	{ wmove(_stdscr, y, x); }
 	void curs_addch(char ch)	{ waddch(_stdscr, ch); }
+	void curs_mvaddch(int y, int x, char ch)
+					{ mvwaddch(_stdscr, y, x, ch); }
+	void curs_mvaddstr(int y, int x, char * str)
+					{ mvwaddstr(_stdscr, y, x, str); }
 
 	//// Member accessors
 	int maxy() 		{ return _maxy; }
 	int maxx() 		{ return _maxx; }
+	int updatecounter()	{ return _updatecounter; }
 	
 protected:
 	// This is the main update thread
@@ -98,6 +110,7 @@ protected:
 
 	// Current Screen state
 	static int _cursattrs;
+	static int _updatecounter;
 
 	// Artifact variables
 	static vector<Artifact *> _artifactList;
