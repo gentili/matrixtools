@@ -1,0 +1,47 @@
+Top Screen:
+	Grab list of interesting machines from config file.
+	Subscribe to each machine for periodic load average updates.
+	Speed of string drop determined by log of load average.
+	Load average updates come with name of hottest running process(')
+	- Select causes reverse/scroll
+	- Can "zoom" to selected machine
+
+Top Machine Screens:
+   Network Connections:
+	Grab list of active network connections.
+	Subscribe to open/close events.
+	Subscribe to periodic load average updates.
+	Speed of string drop determined by log of load average.
+	- Select causes reverse/scroll.
+	- Can "zoom" to selected connection's Connection Screen.
+	- Can "zoom" to selected connection's owning Process Screen.
+	
+   Users Logged In:
+	Grab list of logged in users.
+	Subscribe to login/logout events.
+
+	Subscribe to periodic load average updates. 
+	(user load is cumulative load of that session's processes?)
+	Speed of string drop determined by log of load average
+		or
+	Subscribe to terminal activity timer reset events.
+	Speed of string drop determined by decaying pty activity timer.
+
+	- Select causes reverse/scroll.
+	- Can "zoom" to selected user's User Screen.
+
+   Process List:
+	Grab process list.
+	Subscribe to spawn/terminate events.
+
+	Subscribe to execution counter change events.
+
+	Speed of string drop determined by size of execution counter change.
+
+	- Select causes reverse/scroll.
+	- Can "zoom" to selected process' Process Screen.
+
+Leaf Screens:
+   Connection Screen:
+   User Screen:
+   Process Screen:

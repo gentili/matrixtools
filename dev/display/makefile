@@ -6,7 +6,7 @@ LIBDIRS=	-L../utility -L.
 INCDIRS=	-I../utility
 
 # -----------------------
-ALL_TARGETS= libdisplay.a test droptest reptest attrtest clock
+ALL_TARGETS= libdisplay.a test droptest reptest attrtest
 include ../makefile.in
 # -----------------------
 
@@ -28,7 +28,4 @@ reptest: libdisplay.a reptest.o
 	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
 
 attrtest: libdisplay.a attrtest.o
-	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
-
-clock: libdisplay.a clock.o
 	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
