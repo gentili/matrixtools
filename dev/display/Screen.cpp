@@ -202,7 +202,7 @@ bool Screen::addArtifact (Artifact * newart)
 		return false;
 
 	// Add the artifact
-	_artifactList.push(newart);
+	_artifactList.push_back(newart);
 	
 	return true;
 }
@@ -213,7 +213,15 @@ bool Screen::delArtifact(Artifact * oldart)
 		return false;
 
 	// Delete the artifact
-	
+	static vector<Artifact *>::iterator aitr = 
+		find (_artifactList.begin(),
+				_artifactList.end(),
+				oldart);
+
+	if (aitr == _artifactList.end())
+		return false;
+
+	_artifactList.erase(aitr);
 	
 	return true;
 }
@@ -224,6 +232,7 @@ bool Screen::flushArtifacts()
 		return false;
 
 	// Clear out the entire artifact list
+	_artifactList.clear();
 	
 	return true;
 }
@@ -291,6 +300,13 @@ void Screen::run()
 
 		// Go through the artifact list and do any work
 		// that's available in this update
+		for (vector<Artifact *>::iterator Aitr = _artifactList.begin();
+				Aitr != _artifactList.end();
+				Aitr++)
+		{
+			(*Aitr)->render(this);
+		}
+		
 
 		// Now check to see if there are any characters
 		// that need to be sent to the client

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include "Screen.h"
+#include "MatrixColumn.h"
 
 bool exitnow = false;
 
@@ -41,11 +42,21 @@ int main (int argc, char * argv[])
 	Screen scr;
 
 	// Init the screen singleton
-	if (!scr.init(10, &processchar))
+	if (!scr.init(20, &processchar))
 	{
 		printf ("ERROR: Unable to initialize display terminal!\n");
 		exit (1);
 	}
+
+	// OK, set up a bunch of columns for fun
+	vector<Artifact *> Alist;
+	for (int i = 0; i < scr.maxx(); i++)
+	{
+		MatrixColumn * newmcol = new MatrixColumn(i);
+		scr.addArtifact(newmcol);
+		Alist.push_back(newmcol);
+	}
+	
 	// Start the screen update thread
 	scr.startUpdates();
 

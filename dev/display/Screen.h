@@ -4,6 +4,7 @@
 // System includes
 #include <ncurses.h>
 #include <vector>
+#include <algorithm>
 
 // Foreign includes
 #include "MTObject.h"
@@ -53,6 +54,14 @@ public:
 	void attr_on_bold()	{ _cursattrs |= A_BOLD; }
 
 	void attr_register()	{ attrset( _cursattrs ); }
+
+	//// Cursor control functions
+	void curs_move(int y, int x)	{ wmove(_stdscr, y, x); }
+	void curs_addch(char ch)	{ waddch(_stdscr, ch); }
+
+	//// Member accessors
+	int maxy() 		{ return _maxy; }
+	int maxx() 		{ return _maxx; }
 	
 protected:
 	// This is the main update thread
