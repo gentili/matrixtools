@@ -36,7 +36,9 @@ pthread_cond_t Screen::_updatecond = PTHREAD_COND_INITIALIZER;
 
 bool Screen::init(float updatefreq, void (* charprocfunc) (int))
 {
+#ifdef DEBUG
 	char	tmpbuf[256];
+#endif
 	
 	if (_inited)
 		return false;
@@ -340,8 +342,8 @@ void Screen::run()
 		fprintf(dbglog, "Skipped pthread_cond_timedwait() Now %d:%09d Due %d:%09d\n",
 				(int) now.tv_sec, (int) now.tv_usec * 1000,
 				(int) due.tv_sec, (int) due.tv_nsec);
-#endif
 		}
+#endif
 
 	}
 	threadExit();
