@@ -12,11 +12,16 @@ class Screen : public MTObject
 public:
 	// Init grabs control of the tty, reads in all the specs,
 	// and generally sets everything up to start updating the display
-	void init();
+	bool init();
+
+	bool shutdown();
 	
 protected:
 	// This is the main update thread
 	virtual void run();
+
+	// This describes if the screen has been inited yet
+	static bool _inited;
 
 private:
 };

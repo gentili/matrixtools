@@ -1,5 +1,5 @@
 
-LIBS=	-lncurses -lutility -ldisplay
+LIBS=	-lncurses -lutility -ldisplay -lpthread
 
 LIBDIRS=	-L../utility -L.
 
@@ -10,7 +10,7 @@ ALL_TARGETS= libdisplay.a test
 include ../makefile.in
 # -----------------------
 
-OFILES =	screen.o
+OFILES =	Screen.o
 
 libdisplay.a: $(OFILES)
 	ar vr $@ $^
