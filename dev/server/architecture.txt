@@ -41,7 +41,7 @@ abstract class Session
 
    User
 	bool		update_UserInfo (UserInfo);
-	bool		subs_UserActivityInfo (UserActivityInfo);
+	bool		update_UserActivityInfo (UserActivityInfo);
 
    Process
 	bool		update_ProcessInfo(ProcessInfo);
