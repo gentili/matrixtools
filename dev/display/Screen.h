@@ -18,11 +18,13 @@ class Screen : public MTObject
 public:
 	// Init grabs control of the tty, reads in all the specs,
 	// and generally sets everything up to start updating the display
-	bool init(float updatefreq);
+	bool init(float updatefreq, void (* charprocfunc) (int));
 
 	void startUpdates() 	{ createThreads(); }
 
 	bool shutdown();
+
+	int curs_getch()		{ return curs_getch(); }
 
 	void attr_set_red() 	{ _cursattrs = _colortbl[1]; }
 	void attr_set_green() 	{ _cursattrs = _colortbl[2]; }
@@ -54,6 +56,7 @@ protected:
 	// Config variables
 	static float _updatefreq;
 	static struct timespec _updateperiod;
+	static void * _charprocfunc;
 
 	// Current Screen state
 	static int _cursattrs;

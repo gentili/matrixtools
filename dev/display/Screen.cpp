@@ -22,6 +22,7 @@ int Screen::_colortbl[8];
 
 float Screen::_updatefreq = 0;
 struct timespec Screen::_updateperiod;
+void * Screen::_charprocfunc = NULL;
 
 pthread_mutex_t Screen::_updatelock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t Screen::_updatecond = PTHREAD_COND_INITIALIZER;
@@ -29,12 +30,15 @@ bool Screen::_workavailable = false;
 
 // Member functions of the Screen singleton
 
-bool Screen::init(float updatefreq)
+bool Screen::init(float updatefreq, void (* charprocfunc) (int))
 {
 	char	tmpbuf[256];
 	
 	if (_inited)
 		return false;
+
+	// Assign character processing callback
+	_charprocfunc = (void *) charprocfunc;
 
 	// Figure out update frequency dependent stuff
 	if (updatefreq < 0)
@@ -57,7 +61,8 @@ bool Screen::init(float updatefreq)
 		return false;
 	if (leaveok(_stdscr, true) == ERR)  // Leave cursor in place after update
 		return false;
-	
+	timeout(0); // Because nodelay() doesn't work
+
 	// Initialize terminal info
 	getmaxyx (_stdscr, _maxy, _maxx);
 
@@ -225,6 +230,16 @@ void Screen::run()
 		// Go through the artifact list and do any work
 		// that's available in this update
 
+		// Now check to see if there are any characters
+		// that need to be sent to the client
+
+		int newchar;
+		while ((newchar = wgetch(_stdscr)) != ERR)
+		{
+			if (_charprocfunc != NULL)
+				(* (void (*) (int)) _charprocfunc) (newchar);
+		}
+		
 		// Now run through the artifact list to see if
 		// any work has become available
 
