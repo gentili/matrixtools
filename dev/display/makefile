@@ -10,7 +10,7 @@ ALL_TARGETS= libdisplay.a test
 include ../makefile.in
 # -----------------------
 
-CFLAGS +=
+CFLAGS += -DDEBUG
 
 OFILES =	Screen.o MatrixColumn.o
 

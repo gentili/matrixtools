@@ -118,7 +118,6 @@ protected:
 	// Multithreading jabber
 	static pthread_mutex_t _updatelock;
 	static pthread_cond_t _updatecond;
-	static bool _workavailable;
 
 private:
 };

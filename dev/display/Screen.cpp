@@ -29,7 +29,6 @@ vector<Artifact *> Screen::_artifactList;
 
 pthread_mutex_t Screen::_updatelock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t Screen::_updatecond = PTHREAD_COND_INITIALIZER;
-bool Screen::_workavailable = false;
 
 /////////////////////////////////////
 ///// Singleton Control Functions
@@ -280,8 +279,11 @@ void Screen::run()
 				 (now.tv_usec * 1000 > due.tv_nsec)))
 		{
 			// Yes, so calc when next update's due
-			due.tv_sec = now.tv_sec + _updateperiod.tv_sec;
-			due.tv_nsec = now.tv_usec * 1000 + _updateperiod.tv_nsec;
+			//due.tv_sec = now.tv_sec + _updateperiod.tv_sec;
+			//due.tv_nsec = now.tv_usec * 1000 + _updateperiod.tv_nsec;
+			due.tv_sec += _updateperiod.tv_sec;
+			due.tv_nsec += _updateperiod.tv_nsec;
+
 			if (due.tv_nsec >= 1000000000)
 			{
 				due.tv_nsec -= 1000000000;
@@ -320,18 +322,26 @@ void Screen::run()
 				(* (void (*) (int)) _charprocfunc) (newchar);
 		}
 		
-		// Now run through the artifact list to see if
-		// any work has become available
+		gettimeofday(&now,NULL);
 
-		pthread_mutex_lock (&_updatelock);
-
-		if (!_workavailable)
+		// Are we due for an update?
+		if ((now.tv_sec < due.tv_sec) ||
+				((now.tv_sec == due.tv_sec) &&
+				 (now.tv_usec * 1000 < due.tv_nsec)))
 		{
 			// OK, now sleep until the next update
 			// or until some work wakes us up
+			pthread_mutex_lock (&_updatelock);
 			pthread_cond_timedwait(&_updatecond, &_updatelock, &due);
+			pthread_mutex_unlock (&_updatelock);
+		} 
+#ifdef DEBUG
+		else {
+		fprintf(dbglog, "Skipped pthread_cond_timedwait() Now %d:%09d Due %d:%09d\n",
+				(int) now.tv_sec, (int) now.tv_usec * 1000,
+				(int) due.tv_sec, (int) due.tv_nsec);
+#endif
 		}
-		pthread_mutex_unlock (&_updatelock);
 
 	}
 	threadExit();
