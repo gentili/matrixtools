@@ -1,22 +1,10 @@
---------------------------
-abstract class Session
-
-	Session throws exception if closed.
+abstract class SystemFacade
 
    Machine
-
-      Facade
 	MachineInfo 	get_subs_MachineInfo(Callback);
 	void		subs_MachineLoadInfo(Callback);
 
-      Interface
-	bool		update_MachineInfo(MachineInfo);
-	bool		update_MachineLoadInfo(MachineLoadInfo);
-
    Network
-
-      Facade
-
 	NetworkInfo	get_subs_NetworkInfo (Callback);
 	NetworkLoadInfo	get_subs_NetworkLoadInfo (Callback);
 	vector < NetworkConnectionInfo >
@@ -26,35 +14,36 @@ abstract class Session
 	void 		subs_NetworkActivityInfo (Callback);
 	void 		subs_NetworkActivityInfo (Callback, UserID);
 
-      Interface
+   User
+	vector < UserInfo >
+			get_subs_UserInfo (Callback);
+	void 		subs_UserActivityInfo (Callback);
 
+   Process
+	vector < ProcessInfo >
+			get_subs_ProcessInfo(Callback);
+	void		subs_ProcessActivityInfo(Callback);
+
+--------------------------
+abstract class Session
+
+	Session throws exception if closed.
+
+   Machine
+	bool		update_MachineInfo(MachineInfo);
+	bool		update_MachineLoadInfo(MachineLoadInfo);
+
+   Network
 	bool		update_NetworkInfo (NetworkInfo);
 	bool		update_NetworkLoadInfo (NetworkLoadInfo);
 	bool		update_NetworkConnectionInfo (vector < NetworkConnectionInfo > );
 	bool		update_NetworkActivityInfo (vector < NetworkActivityInfo > );
 
    User
-
-      Facade
-
-	vector < UserInfo >
-			get_subs_UserInfo (Callback);
-	void 		subs_UserActivityInfo (Callback);
-
-      Interface
 	bool		update_UserInfo (UserInfo);
 	bool		subs_UserActivityInfo (UserActivityInfo);
 
    Process
-
-      Facade
-
-	vector < ProcessInfo >
-			get_subs_ProcessInfo(Callback);
-	void		subs_ProcessActivityInfo(Callback);
-
-      Interface
-
 	bool		update_ProcessInfo(ProcessInfo);
 	bool		update_ProcessActivityInfo(ProcessActibityInfo);
 
