@@ -1,0 +1,18 @@
+CXX = g++
+CC = g++
+MAKE = gmake
+SHELL = /bin/bash
+
+CFLAGS = -Wall -g
+
+# General rules
+all: $(ALL_TARGETS)
+
+clean:
+	@echo " "
+	@echo "*** cleaning ***"
+	@echo " "
+	rm $(ALL_TARGETS); rm *.o
+
+%.o : %.cpp
+	$(CXX) -c $(OFLAGS) $(CFLAGS) $(INCDIRS) $< -o $@

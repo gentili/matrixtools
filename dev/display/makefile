@@ -1,18 +1,19 @@
 
-LIBS=	-lncurses -lutility
+LIBS=	-lncurses -lutility -ldisplay
 
-LIBDIRS=	-L../utility
+LIBDIRS=	-L../utility -L.
 
-CFLAGS=	-Wall -g
+INCDIRS=	-I../utility
 
-CXX=	g++
+# -----------------------
+ALL_TARGETS= libdisplay.a test
+include ../makefile.in
+# -----------------------
 
-REQOBJS=
+OFILES =	screen.o
 
-all: $(REQOBJS) test
+libdisplay.a: $(OFILES)
+	ar vr $@ $^
 
-test: $(REQOBJS) test.o
-	$(CXX) -o $@ $(CFLAGS) $^ $(LIBDIRS) $(LIBS)
-
-clean:
-	rm -f *.o test
+test: libdisplay.a test.o
+	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
