@@ -8,7 +8,7 @@
 #include "Screen.h"
 #include "MatrixColumn.h"
 #include "AbstractModule.h"
-#include "ClockModule.h"
+#include "PSModule.h"
 
 // Local Defines
 #define CYCLEFREQ	30
@@ -27,22 +27,10 @@
 	nanosleep (&ts, NULL); \
 } while (0);
 
-typedef enum MatrixStateEnum {
-	MS_init = 0,
-	MS_runmod,
-	MS_exit
-} MatrixState_e;
-
-MatrixState_e mstate = MS_init;
-
 AbstractModule * curmod = NULL;
 
 void processchar (int c)
 {
-	// Deal with global control characters
-	if (c == 'x')
-		mstate = MS_exit;
-	
 	if (curmod != NULL)
 		curmod->processchar(c);
 }
@@ -90,10 +78,7 @@ int main (int argc, char * argv[])
 		MClist.push_back(newmcol);
 	}
 	
-	// Start the screen update thread
-	scr.startUpdates();
-
-	// Do an initial clear sweep
+	// Schedule an initial clear sweep
 	std::vector<MatrixColumn *>::iterator MCitr = MClist.begin();
 
 	while (MCitr != MClist.end())
@@ -102,33 +87,22 @@ int main (int argc, char * argv[])
 		MCitr++;
 	}
 
+	// Start with a process module
+	curmod = new PSModule();
+	
 	////////////////////////
-	// MAIN STATE MACHINE
+	// MAIN LOOP
 	////////////////////////
 	// Cross State variables
-	ResType * rt = NULL;
-	while (mstate != MS_exit)
+	while (curmod != NULL)
 	{
-		switch (mstate)
-		{
-		case MS_init:
-			// Do any setup 
-			mstate = MS_runmod;
-			break;
-		case MS_runmod:
-			rt = curmod->execute(scr, MClist);
-			break;
-		default:
-			break;
-		}
-		// Do something here to determine
-		// what the next state should be based on
-		// something 
-		NSLEEP(0, 10000000);
+		AbstractModule * nextmod = NULL;
+		scr.startUpdates();
+		nextmod = curmod->execute(scr, MClist);
+		scr.stopUpdates();
+		delete (curmod);
+		curmod = nextmod;
 	}
-
-	// Stop the screen update thread
-	scr.stopUpdates();
 
 	// cleanup the screen
 	scr.cleanup();

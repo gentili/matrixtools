@@ -15,5 +15,5 @@ CFLAGS +=
 
 OFILES =
 
-matrix: matrix.o
+matrix: matrix.o PSModule.o
 	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
