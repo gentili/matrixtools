@@ -27,8 +27,8 @@ public:
    // Network
 	virtual bool		update_NetworkInfo (NetworkInfo&) = 0;
 	virtual bool		update_NetworkLoadInfo (NetworkLoadInfo&) = 0;
-	virtual bool		update_NetworkConnectionInfo (vector < NetworkConnectionInfo > &) = 0;
-	virtual bool		update_NetworkActivityInfo (vector < NetworkActivityInfo > &) = 0;
+	virtual bool		update_NetworkConnectionInfo (std::vector < NetworkConnectionInfo > &) = 0;
+	virtual bool		update_NetworkActivityInfo (std::vector < NetworkActivityInfo > &) = 0;
 
    // User
 	virtual bool		update_UserInfo (UserInfo &) = 0;

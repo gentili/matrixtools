@@ -11,7 +11,7 @@
 bool MachineSingleton::_running = false;
 bool MachineSingleton::_shutdown = false;
 bool MachineSingleton::_MachineLoadMonitor_running = false;
-vector<Ref<Session>*> MachineSingleton::_MachineLoadMonitor_subscribers;
+std::vector<Ref<Session>*> MachineSingleton::_MachineLoadMonitor_subscribers;
 
 // Data
 MachineInfo MachineSingleton::_curMI;
@@ -95,7 +95,7 @@ void * MachineSingleton::MachineLoadMonitor(void * arg)
 
 		// Go through the subscription list
 		pthread_mutex_lock (&_lock);
-		for (vector<Ref<Session>*>::iterator sitr = _MachineLoadMonitor_subscribers.begin();
+		for (std::vector<Ref<Session>*>::iterator sitr = _MachineLoadMonitor_subscribers.begin();
 				sitr != _MachineLoadMonitor_subscribers.end();
 				sitr++)
 		{

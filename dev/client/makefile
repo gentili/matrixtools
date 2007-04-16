@@ -3,7 +3,7 @@ LIBS=	-lncurses -lutility -ldisplay -lpthread
 
 LIBDIRS=	-L../utility -L../display
 
-INCDIRS=	-I../utility -I../display
+INCDIRS=	-I../utility -I../display -I../server
 
 # -----------------------
 ALL_TARGETS= matrix 

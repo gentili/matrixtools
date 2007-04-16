@@ -7,32 +7,20 @@
 // Local Includes
 #include "Screen.h"
 #include "MatrixColumn.h"
+#include "ClockModule.h"
 
-// Local Defines
-#define TEST_CYCLEFREQ	30
-
-#define TEST_ERR_HALT(errstr) do { \
-	scr.stopUpdates(); \
-	scr.cleanup(); \
-	printf("%s",errstr); \
-	exit (1); \
-} while (0);
-
-#define TEST_NSLEEP(sec, nsec) do { \
-	struct timespec ts; \
-	ts.tv_sec = sec; \
-	ts.tv_nsec = nsec; \
-	nanosleep (&ts, NULL); \
-} while (0);
-
-bool exitnow = false;
-
-void processchar (int c)
+// AbstractModule Interface specification
+void ClockModule::processchar (int c)
 {
-	if (c == 'x')
-		exitnow = true;
 }
 
+ResType * execute(Screen & scr, std::vector<MatrixColumn *> & MClist)
+{
+	return NULL;
+}
+
+// Private members
+/*
 int setupdigit(Screen & scr, int startcol, int digit, int horizseg)
 {
 	int i = startcol;
@@ -210,7 +198,6 @@ int main (int argc, char * argv[])
 	// Build digits
 	
 	
-	/*
 	scr.cleanup();
 	printf ("Screen: %dx%d\n",scr.maxx(), scr.maxy());
 	printf ("Vert seg size: %d\n", vertseg);
@@ -226,7 +213,6 @@ int main (int argc, char * argv[])
 	printf ("horiz_topbot: %d\n", horiz_topbot.size());
 	printf ("colon: %d\n", colon.size());
 	exit (0);
-	*/
 
 	//////////////////////////////
 	// Set up matrix columns
@@ -278,3 +264,4 @@ int main (int argc, char * argv[])
 
 	return 0;
 }
+*/

@@ -1,6 +1,7 @@
 // System Includes
 #include <unistd.h>
 #include <stdio.h>
+#include <vector>
 
 // Foreign includes
 #include "Ref.h"
@@ -23,9 +24,9 @@ public:
 		{ return _active; }
 	virtual bool		update_NetworkLoadInfo (NetworkLoadInfo&)
 		{ return _active; }
-	virtual bool		update_NetworkConnectionInfo (vector < NetworkConnectionInfo > &)
+	virtual bool		update_NetworkConnectionInfo (std::vector < NetworkConnectionInfo > &)
 		{ return _active; }
-	virtual bool		update_NetworkActivityInfo (vector < NetworkActivityInfo > &)
+	virtual bool		update_NetworkActivityInfo (std::vector < NetworkActivityInfo > &)
 		{ return _active; }
 
    // User

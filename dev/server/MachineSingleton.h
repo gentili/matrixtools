@@ -25,7 +25,7 @@ private:
 	// Monitor threads
 	static void *		MachineLoadMonitor (void * arg);
 	static bool		_MachineLoadMonitor_running;
-	static vector<Ref<Session>*> _MachineLoadMonitor_subscribers;
+	static std::vector<Ref<Session>*> _MachineLoadMonitor_subscribers;
 
 	// Control members
 	static bool _running;
