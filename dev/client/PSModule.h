@@ -13,6 +13,9 @@ public:
 	virtual void processchar(int c);
 
 	virtual AbstractModule * execute(Screen & scr, std::vector<MatrixColumn *> & MClist);
+
+private:
+	bool _terminate;
 };
 
 #endif
