@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <math.h>
+#include "sysinfo.h"
 
 // Local Includes
 #include "Screen.h"
