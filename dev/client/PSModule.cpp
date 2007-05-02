@@ -26,12 +26,14 @@ void PSModule::processchar (int c)
 AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & MClist)
 {
 	// Seed the MC maps
+	int i = 0;
 	for (std::vector<MatrixColumn *>::iterator MCitr = MClist.begin();
 			MCitr != MClist.end();
 			MCitr++)
 	{
-		// Mark all of the columns as unassigned (NULL)
-		_MC_Proc_map.insert(std::pair < MatrixColumn *, Proc * > (*MCitr, NULL));
+		// Mark odd columns as unassigned (NULL)
+		if (i++ % 2)
+			_MC_Proc_map.insert(std::pair < MatrixColumn *, Proc * > (*MCitr, NULL));
 	}
 
 	///////////////////////
@@ -122,15 +124,13 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				char cmd[80];
 				int cmdlen = 80;
 				escape_command(cmd,MCitr->second->_ptsk,80,&cmdlen,ESC_ARGS);
-				snprintf (buf, 80, "%d %03f %08llu %s",
+				snprintf (buf, 80, "%d %s          ",
 						MCitr->second->_ptsk->tid,
-						MCitr->second->_cpu,
-						MCitr->second->_tics,
 						cmd);
 
 				MCitr->first->add_clear_event(true, false, false);
-				MCitr->first->add_setattr_event(false,false,true,scr.curs_attr_bold() | scr.curs_attr_reverse() | scr.curs_attr_red());
-				MCitr->first->add_setstring_event(false,false,true,buf);
+				MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_bold() | scr.curs_attr_reverse() | scr.curs_attr_red());
+				MCitr->first->add_setstring_event(false,false,false,buf);
 				MCitr->first->add_stringfill_event(false,false,true);
 				MCitr->second = NULL;
 
@@ -172,7 +172,8 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			if (pidMCitr != _pid_MC_map.end())
 			{
 				// Yes, adjust the update rate accordingly
-				pidMCitr->second->add_stringdrop_event(false,true,true,procitr->first,-1,false, scr.curs_attr_bold() | scr.curs_attr_white());
+				pidMCitr->second->add_setattr_event(false,false,false, scr.curs_attr_green());
+				pidMCitr->second->add_stringdrop_event(false,true,false,procitr->first*0.1,-1,true, scr.curs_attr_bold() | scr.curs_attr_white());
 			} else
 			{
 				// No, get the lowest speed MC
@@ -189,32 +190,31 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				_cpu_MC_map.erase(_cpu_MC_map.begin());
 				
 				// Set the string
-				char buf[80];
-				char cmd[80];
-				int cmdlen = 80;
-				escape_command(cmd,procitr->second->_ptsk,80,&cmdlen,ESC_ARGS);
-				snprintf (buf, 80, "%d %03f %08llu %s",
+				char buf[1024];
+				char cmd[1024];
+				int cmdlen = 1024;
+				escape_command(cmd,procitr->second->_ptsk,1024,&cmdlen,ESC_ARGS);
+				snprintf (buf, 1024, "%d %s         ",
 						procitr->second->_ptsk->tid,
-						procitr->second->_cpu,
-						procitr->second->_tics,
 						cmd);
-				/*
 				if (procitr->second->_pnew)
 				{
 					// New processes get a full speed drop
-					MCProcitr->first->add_setattr_event(false,false,true, scr.curs_attr_green());
-					MCProcitr->first->add_setstring_event(false,false,true,buf);
-					MCProcitr->first->add_stringdrop_event(false,false,false,10,-1,false, scr.curs_attr_bold() | scr.curs_attr_white());
+					MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_bold() | scr.curs_attr_green());
+					MCProcitr->first->add_setstring_event(false,false,false,buf);
+					MCProcitr->first->add_stringdrop_event(false,false,false,1,scr.maxy() < strlen(buf) ? scr.maxy() : strlen(buf),false, scr.curs_attr_bold() | scr.curs_attr_white());
+					MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_green());
+					MCProcitr->first->add_stringfill_event(false,false,false);
 					
-				} else
-				*/
+				} 
+				else
 				{
 					// Old processes get a regular speed drop
-					MCProcitr->first->add_setattr_event(false,false,true, scr.curs_attr_green());
-					MCProcitr->first->add_setstring_event(false,false,true,buf);
-					MCProcitr->first->add_stringdrop_event(false,true,true,procitr->first,-1,false, scr.curs_attr_bold() | scr.curs_attr_white());
+					MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_green());
+					MCProcitr->first->add_clear_event(false,false,false);
+					MCProcitr->first->add_setstring_event(false,false,false,buf);
+					MCProcitr->first->add_stringdrop_event(false,true,false,procitr->first*0.1,-1,false, scr.curs_attr_bold() | scr.curs_attr_white());
 				}
-				
 			}
 			MCcount--;
 		}

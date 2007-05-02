@@ -84,6 +84,7 @@ int main (int argc, char * argv[])
 
 	while (MCitr != MClist.end())
 	{
+		(*MCitr)->add_setattr_event (false, false, false, scr.curs_attr_green());
 		(*MCitr)->add_clear_event (false, false, false);
 		MCitr++;
 	}

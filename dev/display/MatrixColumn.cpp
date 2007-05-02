@@ -351,6 +351,7 @@ bool MCE_SetString::render(MatrixColumn * mc, Screen * curscr)
 void MCE_SetString::compress(MatrixColumn * mc, Screen * curscr)
 {
 	strncpy (mc->_curstr, _newstr, MC_MAX_STR);
+	mc->_curstrlen = strlen(mc->_curstr);
 	return;
 }
 
