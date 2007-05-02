@@ -12,7 +12,7 @@
 
 class Proc {
 public:
-	Proc(proc_t * ptsk) : _pnew(true), _palive(true), _ptsk(ptsk), _cpu(1) {}
+	Proc(proc_t * ptsk) : _pnew(true), _palive(true), _ptsk(ptsk), _cpu(100) {}
 
 	bool _pnew;
 	bool _palive;
@@ -40,8 +40,10 @@ private:
 	// Speed sorted process list
 	std::multimap<float, Proc *> _cpu_Proc_map;
 
-	// Pid sorted MColumn list
+	// MColumn sorted Proc list
 	std::map<MatrixColumn *, Proc *> _MC_Proc_map;
+	// Pid sorted MColumn list
+	std::map<int, MatrixColumn *> _pid_MC_map;
 	// Speed sorted MColumn list
 	std::multimap<float, MatrixColumn *> _cpu_MC_map;
 	
