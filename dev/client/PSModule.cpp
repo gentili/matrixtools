@@ -136,8 +136,10 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 						cmd);
 
 				MCitr->first->resetLRU();
-				MCitr->first->add_clear_event(true, false, false);
-				MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_bold() | scr.curs_attr_reverse() | scr.curs_attr_red());
+				MCitr->first->add_setattr_event(true,false,false,scr.curs_attr_reverse() | scr.curs_attr_red());
+				MCitr->first->add_clear_event(false, false, false);
+				MCitr->first->add_delay_event(false,false,false,5);
+				MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_bold() | scr.curs_attr_red());
 				MCitr->first->add_setstring_event(false,false,false,buf);
 				MCitr->first->add_stringfill_event(false,false,false);
 				MCitr->second = NULL;
@@ -222,29 +224,22 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			snprintf (buf, 1024, "%d %s *** ",
 					procitr->second->_ptsk->tid,
 					cmd);
+			int newattr = scr.curs_attr_bold();
 			if (procitr->second->_pnew)
 			{
-				// New processes get a full speed drop
-				MCProcitr->first->resetLRU();
-				MCProcitr->first->add_setattr_event(true,false,false, scr.curs_attr_bold() | scr.curs_attr_green());
-				MCProcitr->first->add_setstring_event(false,false,false,buf);
-				MCProcitr->first->add_stringdrop_event(false,false,false,
-						1,(int) scr.maxy() < (int) strlen(buf) ? scr.maxy() : strlen(buf),false, scr.curs_attr_bold() | scr.curs_attr_white());
-				MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_green());
-				MCProcitr->first->add_stringfill_event(false,false,false);
-				
-			} 
-			else
-			{
-				// Old processes get a regular speed drop
-				MCProcitr->first->resetLRU();
-				MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_blue());
-				MCProcitr->first->add_clear_event(false,false,false);
-				MCProcitr->first->add_setstring_event(false,false,false,buf);
-				// MCProcitr->first->add_stringdrop_event(false,true,false,procitr->first*0.1,-1,false, scr.curs_attr_bold() | scr.curs_attr_white());
-				MCProcitr->first->add_stringdrop_event(false,false,true,
-						1,-1,false, scr.curs_attr_bold() | scr.curs_attr_white());
+				newattr |= scr.curs_attr_green();
+			} else {
+				newattr |= scr.curs_attr_blue();
 			}
+			
+			// Brand new processes get a full speed drop
+			MCProcitr->first->resetLRU();
+			MCProcitr->first->add_setattr_event(true,false,false, newattr);
+			MCProcitr->first->add_clear_event(false,false,false);
+			MCProcitr->first->add_setstring_event(false,false,false,buf);
+			MCProcitr->first->add_stringdrop_event(false,false,false,
+					1,(int) scr.maxy() < (int) strlen(buf) ? scr.maxy() : strlen(buf),false, scr.curs_attr_bold() | scr.curs_attr_white());
+				
 		}
 	}
 
