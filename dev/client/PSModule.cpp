@@ -33,10 +33,11 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			MCitr++)
 	{
 		// Mark odd columns as unassigned (NULL)
-		if (i++ % 2)
+		if (++i % 2)
 			_MC_Proc_map.insert(std::pair < MatrixColumn *, Proc * > (*MCitr, NULL));
 	}
 
+	bool firstloop = true;
 	///////////////////////
 	// Main processing loop
 	///////////////////////
@@ -105,6 +106,13 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			_cpu_Proc_map.insert (std::pair<float, Proc *> (procitr->second._cpu, &procitr->second));
 		}
 		closeproc(PT);
+		// OK, if this is our first time through the loop then we don't
+		// need to do any of the following, so skip it.
+		if (firstloop)
+		{
+			firstloop = false;
+			continue;
+		}
 		// Regenerate the LRU and pid sorted MColumn list
 		_LRU_MC_map.clear();
 		_pid_MC_map.clear();
