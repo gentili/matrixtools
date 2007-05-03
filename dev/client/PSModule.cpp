@@ -25,6 +25,7 @@ void PSModule::processchar (int c)
 
 AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & MClist)
 {
+	// FILE * log = fopen ("PSMatrix.log", "w+");
 	// Seed the MC maps
 	int i = 0;
 	for (std::vector<MatrixColumn *>::iterator MCitr = MClist.begin();
@@ -60,6 +61,8 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				procitr != _pid_Proc_map.end();
 				procitr++)
 		{
+			//fprintf (log, "Mark OldDead: %d\n",procitr->first);
+			assert (procitr->first == procitr->second._ptsk->tid);
 			procitr->second._pnew = false;
 			procitr->second._palive = false;
 			procitr->second._cpu = 0;
@@ -81,9 +84,11 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			if (procitr == _pid_Proc_map.end())
 			{
 				procitr = _pid_Proc_map.insert(std::pair<int, Proc>(ptsk->tid,Proc(ptsk))).first;
+				//fprintf (log, "Mark New: %d\n",procitr->first);
 			} else
 			// if exists
 			{
+				//fprintf (log, "Mark Alive: %d\n",procitr->first);
 				// marked as alive
 				procitr->second._palive = true;
 				// do speed calc 
@@ -100,8 +105,8 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			_cpu_Proc_map.insert (std::pair<float, Proc *> (procitr->second._cpu, &procitr->second));
 		}
 		closeproc(PT);
-		// Regenerate the speed and pid sorted MColumn list
-		_cpu_MC_map.clear();
+		// Regenerate the LRU and pid sorted MColumn list
+		_LRU_MC_map.clear();
 		_pid_MC_map.clear();
 		for (std::map<MatrixColumn *, Proc *>::iterator MCitr = _MC_Proc_map.begin();
 				MCitr != _MC_Proc_map.end();
@@ -109,14 +114,16 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 		{
 			if (MCitr->second == NULL)
 			{
+				//fprintf (log, "MC NULL: %p\n",MCitr->first);
 				// If is no associated proc, give it a negative cpu
 				// so it will be picked up before zero cpu procs
 				
-				_cpu_MC_map.insert(std::pair < float, MatrixColumn * > (-1.0,MCitr->first));
+				_LRU_MC_map.insert(std::pair < int, MatrixColumn * > (MCitr->first->getLRU(),MCitr->first));
 
 				
 			} else if (!MCitr->second->_palive)
 			{
+				//fprintf (log, "MC DIED: %p : %d\n",MCitr->first,MCitr->second->_ptsk->tid);
 				// If proc is dead, do a reset and flash fill of
 				// the column, set the proc pointer to null
 				// and give it zero cpu
@@ -124,21 +131,34 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				char cmd[80];
 				int cmdlen = 80;
 				escape_command(cmd,MCitr->second->_ptsk,80,&cmdlen,ESC_ARGS);
-				snprintf (buf, 80, "%d %s          ",
+				snprintf (buf, 80, "%d %s *** ",
 						MCitr->second->_ptsk->tid,
 						cmd);
 
+				MCitr->first->resetLRU();
 				MCitr->first->add_clear_event(true, false, false);
 				MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_bold() | scr.curs_attr_reverse() | scr.curs_attr_red());
 				MCitr->first->add_setstring_event(false,false,false,buf);
-				MCitr->first->add_stringfill_event(false,false,true);
+				MCitr->first->add_stringfill_event(false,false,false);
 				MCitr->second = NULL;
 
-				_cpu_MC_map.insert(std::pair < float, MatrixColumn * > (0,MCitr->first));
+				// Make it just a little less likely to be picked up
+				// than a halted running process, so we force walk about
+				_LRU_MC_map.insert(std::pair < int, MatrixColumn * > (MCitr->first->getLRU(),MCitr->first));
 			} else
 			{
+				//fprintf (log, "MC ALIVE: %p : %d : %f\n",MCitr->first,MCitr->second->_ptsk->tid, MCitr->second->_cpu);
+				// Then adjust the update rate accordingly
+				MCitr->first->add_setattr_event(false,false,false, 
+						scr.curs_attr_green());
+				MCitr->first->add_stringdrop_event(false,true,false,
+						MCitr->second->_cpu*0.1,-1,true,
+						scr.curs_attr_bold() | scr.curs_attr_white());
+				// If the process is sleeping, don't reset the column's LRU
+				if (MCitr->second->_cpu > 0)
+					MCitr->first->resetLRU();
 				// Proc is alive so put it in both sorted lists
-				_cpu_MC_map.insert(std::pair < float, MatrixColumn * > (MCitr->second->_cpu, MCitr->first));
+				_LRU_MC_map.insert(std::pair < int, MatrixColumn * > (MCitr->first->getLRU(), MCitr->first));
 				_pid_MC_map.insert(std::pair < int, MatrixColumn * > (MCitr->second->_ptsk->tid, MCitr->first));
 			}
 		}
@@ -151,6 +171,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			procitr++;
 			if (!deaditr->second._palive)
 			{
+				//fprintf (log, "PROC DEAD: %d\n",procitr->first);
 				// Safe to do this as we're guaranteed not to be
 				// in the cpu sorted list because we're dead
 				free ((void*)*(deaditr->second._ptsk)->cmdline);
@@ -166,83 +187,65 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				)
 		{
 			procitr--;
-			// Is this pid already in the MC list?
-			std::map<int, MatrixColumn *>::iterator pidMCitr = 
-				_pid_MC_map.find(procitr->second->_ptsk->tid);
-			if (pidMCitr != _pid_MC_map.end())
-			{
-				// Yes, adjust the update rate accordingly
-				pidMCitr->second->add_setattr_event(false,false,false, scr.curs_attr_green());
-				pidMCitr->second->add_stringdrop_event(false,true,false,procitr->first*0.1,-1,true, scr.curs_attr_bold() | scr.curs_attr_white());
-			} else
-			{
-				// No, get the lowest speed MC
-				std::map<float, MatrixColumn *>::iterator cpuMCitr = 
-					_cpu_MC_map.begin();
-				assert (cpuMCitr != _cpu_MC_map.end());
-				// Look it up in the MC sorted proc list and make the association
-				std::map<MatrixColumn *, Proc *>::iterator MCProcitr =
-					_MC_Proc_map.find(cpuMCitr->second);
-				assert (MCProcitr != _MC_Proc_map.end());
-				MCProcitr->second = procitr->second;
-
-				// Now pop the lowest speed MC
-				_cpu_MC_map.erase(_cpu_MC_map.begin());
-				
-				// Set the string
-				char buf[1024];
-				char cmd[1024];
-				int cmdlen = 1024;
-				escape_command(cmd,procitr->second->_ptsk,1024,&cmdlen,ESC_ARGS);
-				snprintf (buf, 1024, "%d %s         ",
-						procitr->second->_ptsk->tid,
-						cmd);
-				if (procitr->second->_pnew)
-				{
-					// New processes get a full speed drop
-					MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_bold() | scr.curs_attr_green());
-					MCProcitr->first->add_setstring_event(false,false,false,buf);
-					MCProcitr->first->add_stringdrop_event(false,false,false,1,scr.maxy() < strlen(buf) ? scr.maxy() : strlen(buf),false, scr.curs_attr_bold() | scr.curs_attr_white());
-					MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_green());
-					MCProcitr->first->add_stringfill_event(false,false,false);
-					
-				} 
-				else
-				{
-					// Old processes get a regular speed drop
-					MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_green());
-					MCProcitr->first->add_clear_event(false,false,false);
-					MCProcitr->first->add_setstring_event(false,false,false,buf);
-					MCProcitr->first->add_stringdrop_event(false,true,false,procitr->first*0.1,-1,false, scr.curs_attr_bold() | scr.curs_attr_white());
-				}
-			}
 			MCcount--;
-		}
-		/*
-		int i=1;
-		for (std::map<float, Proc*>::iterator procitr = _cpu_Proc_map.end();
-				procitr != _cpu_Proc_map.begin(); 
-				)
-		{
-			procitr--;
-			ptsk = procitr->second->_ptsk;
-//			if ((procitr->second->_tics == 0))
-//				continue;
-			char buf[80];
-			char cmd[80];
-			int cmdlen = 80;
-			escape_command(cmd,ptsk,80,&cmdlen,ESC_ARGS);
-			snprintf (buf, 80, "%d : %03f : %08llu : %s",
-					ptsk->tid,
-					procitr->second->_cpu,
-					procitr->second->_tics,
-					cmd);
-			scr.curs_mvaddstr (i,1,buf);
-			i++;
-			if (i > scr.maxy())
+			//fprintf (log, "EXAMINING: %d : %f\n",procitr->second->_ptsk->tid, procitr->first);
+			// Are we down in the zero cpu processes?
+			if ((procitr->second->_cpu <= 0) && (!procitr->second->_pnew))
+				// Then to avoid bottom feeder thrashing
+				// we get out.
 				break;
+			// Is this pid already in the MC list?
+			if (_pid_MC_map.end() != _pid_MC_map.find(procitr->second->_ptsk->tid))
+				// Then it's already been dealt with, so skip it
+				continue;
+
+			// OK, so get the LRU column
+			std::map<int, MatrixColumn *>::iterator LRUMCitr = 
+				_LRU_MC_map.end();
+			assert (LRUMCitr != _LRU_MC_map.begin());
+			LRUMCitr--;
+			// Look it up in the MC sorted proc list and make the association
+			std::map<MatrixColumn *, Proc *>::iterator MCProcitr =
+				_MC_Proc_map.find(LRUMCitr->second);
+			assert (MCProcitr != _MC_Proc_map.end());
+			MCProcitr->second = procitr->second;
+
+
+			// Now pop the lowest speed MC
+			_LRU_MC_map.erase(LRUMCitr--);
+			
+			// Set the string
+			char buf[1024];
+			char cmd[1024];
+			int cmdlen = 1024;
+			escape_command(cmd,procitr->second->_ptsk,1024,&cmdlen,ESC_ARGS);
+			snprintf (buf, 1024, "%d %s *** ",
+					procitr->second->_ptsk->tid,
+					cmd);
+			if (procitr->second->_pnew)
+			{
+				// New processes get a full speed drop
+				MCProcitr->first->resetLRU();
+				MCProcitr->first->add_setattr_event(true,false,false, scr.curs_attr_bold() | scr.curs_attr_green());
+				MCProcitr->first->add_setstring_event(false,false,false,buf);
+				MCProcitr->first->add_stringdrop_event(false,false,false,
+						1,(int) scr.maxy() < (int) strlen(buf) ? scr.maxy() : strlen(buf),false, scr.curs_attr_bold() | scr.curs_attr_white());
+				MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_green());
+				MCProcitr->first->add_stringfill_event(false,false,false);
+				
+			} 
+			else
+			{
+				// Old processes get a regular speed drop
+				MCProcitr->first->resetLRU();
+				MCProcitr->first->add_setattr_event(false,false,false, scr.curs_attr_blue());
+				MCProcitr->first->add_clear_event(false,false,false);
+				MCProcitr->first->add_setstring_event(false,false,false,buf);
+				// MCProcitr->first->add_stringdrop_event(false,true,false,procitr->first*0.1,-1,false, scr.curs_attr_bold() | scr.curs_attr_white());
+				MCProcitr->first->add_stringdrop_event(false,false,true,
+						1,-1,false, scr.curs_attr_bold() | scr.curs_attr_white());
+			}
 		}
-		*/
 	}
 
 	return NULL;
