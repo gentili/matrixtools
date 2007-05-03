@@ -135,11 +135,11 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				// If proc is dead, do a reset and flash fill of
 				// the column, set the proc pointer to null
 				// and give it zero cpu
-				char buf[80];
-				char cmd[80];
-				int cmdlen = 80;
-				escape_command(cmd,MCitr->second->_ptsk,80,&cmdlen,ESC_ARGS);
-				snprintf (buf, 80, "%d %s *** ",
+				char buf[1024];
+				char cmd[1024];
+				int cmdlen = 1024;
+				escape_command(cmd,MCitr->second->_ptsk,1024,&cmdlen,ESC_ARGS);
+				snprintf (buf, 1024, "%d %s *** ",
 						MCitr->second->_ptsk->tid,
 						cmd);
 
