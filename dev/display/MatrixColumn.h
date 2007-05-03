@@ -44,7 +44,7 @@ public:
 	// in the same cycle.
 	bool _compressable;
 
-	// NOTE: Skipable overrrides compressable.
+	// NOTE: Skipable overrides compressable.
 protected:
 
 };
@@ -62,6 +62,18 @@ public:
 	virtual void render(Screen * curscr);
 
 	//// Class specific interface (user calls)
+	int getLRU() { 
+		pthread_mutex_lock(&_equeue_lock);
+		int lru = _lru;
+		pthread_mutex_unlock(&_equeue_lock);
+		return lru;
+	}
+
+	void resetLRU() {
+		pthread_mutex_lock(&_equeue_lock);
+		_lru = 0;
+		pthread_mutex_unlock(&_equeue_lock);
+	}
 	
 	// Script manipulators
 	
@@ -110,6 +122,7 @@ protected:
 	// Event Queue Stuff
 	pthread_mutex_t	 _equeue_lock;	// Event queue access lock
 	std::deque<MatrixColumnEvent *> _equeue;	// Event queue
+	int	_lru;
 
 	friend class MCE_Delay;
 	friend class MCE_Clear;

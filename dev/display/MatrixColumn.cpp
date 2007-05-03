@@ -8,14 +8,10 @@
 // Default constructor
 
 MatrixColumn::MatrixColumn(int column)
+	: _column(column), _curstrlen(0), _curattrs(0),
+	_curchar(-1),_curfrac(0),_curpos(-1), _lru(0)
 {
-	_column = column;
 	memset (_curstr, 0, MC_MAX_STR);
-	_curstrlen = 0;
-	_curattrs = 0;
-	_curchar = -1;
-	_curfrac = 0;
-	_curpos = -1;
 	pthread_mutex_init(&_equeue_lock, NULL);
 
 	return;
@@ -47,6 +43,9 @@ void MatrixColumn::render(Screen * curscr)
 
 	bool terminate = false;
 	pthread_mutex_lock(&_equeue_lock);
+	_lru++;
+	if (_lru < 0)
+		_lru = 0;
 	// Is there anything in the queue?
 	while (!terminate && !_equeue.empty())
 	{
