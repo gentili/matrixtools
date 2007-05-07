@@ -15,11 +15,25 @@
 #include "MatrixColumn.h"
 #include "PSModule.h"
 
+PSModule::PSModule()
+{
+	pthread_mutex_init(&_lock, NULL);
+	pthread_cond_init(&_cond, NULL);
+}
+
+PSModule::~PSModule()
+{
+	pthread_mutex_destroy(&_lock);
+	pthread_cond_destroy(&_cond);
+}
+
 // AbstractModule Interface specification
 void PSModule::processchar (int c)
 {
-	if (c == 'x')
-		_terminate = true;
+	pthread_mutex_lock(&_lock);
+	_charqueue.push_back(c);
+	pthread_cond_signal(&_cond);
+	pthread_mutex_unlock(&_lock);
 }
 
 
@@ -46,7 +60,6 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 	_terminate = false;
 	while (!_terminate)
 	{
-		sleep (1);
 		// Figure out the elapsed time
 		gettimeofday(&timev, NULL);
 		float elapsed = (float) (timev.tv_sec - oldtimev.tv_sec)
@@ -248,6 +261,33 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			MCProcitr->first->add_stringdrop_event(false,false,false,
 					1,(int) scr.maxy() < (int) strlen(buf) ? scr.maxy() : strlen(buf),false, scr.curs_attr_bold() | scr.curs_attr_white());
 				
+		}
+		// OK, now do the checkin for input and sleepin thing
+		struct timespec timeout;
+		struct timeval now;
+		gettimeofday (&now, NULL); 
+		timeout.tv_sec = now.tv_sec + 1;
+		timeout.tv_nsec = now.tv_usec * 1000;
+		pthread_mutex_lock(&_lock);
+
+		pthread_cond_timedwait(&_cond,
+				&_lock,
+				&timeout);
+
+		std::deque<char> _curchars;
+		if (!_charqueue.empty())
+		{
+			_curchars = _charqueue;
+			_charqueue.clear();
+		}
+
+		pthread_mutex_unlock(&_lock);
+		
+		while (!_curchars.empty())
+		{
+			if (_curchars.front() == 'x')
+				_terminate = true;
+			_curchars.pop_front();
 		}
 	}
 

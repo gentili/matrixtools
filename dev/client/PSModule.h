@@ -23,8 +23,8 @@ public:
 
 class PSModule : public AbstractModule {
 public:
-	PSModule() { return; }
-	virtual ~PSModule() { return; }
+	PSModule();
+	virtual ~PSModule();
 
 	// regular members
 	virtual void processchar(int c);
@@ -32,6 +32,11 @@ public:
 	virtual AbstractModule * execute(Screen & scr, std::vector<MatrixColumn *> & MClist);
 
 private:
+	// Locking waffle
+	pthread_mutex_t  _lock;
+	pthread_cond_t   _cond;
+	std::deque<char>	_charqueue;
+
 	// indicate user termination request
 	bool _terminate;
 
