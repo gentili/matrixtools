@@ -289,14 +289,25 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			if (_curchars.front() == 'x')
 				_terminate = true;
 			// Clear dead processes
+			bool cleandead = false;
 			if (_curchars.front() == 'd')
+				cleandead = true;
+			// Clear all inactive processes
+			bool cleaninactive = false;
+			if (_curchars.front() == 'c')
+				cleaninactive = true;
+			if (cleaninactive || cleandead)
 			{
 				for (std::map<MatrixColumn *, Proc *>::iterator MCitr = _MC_Proc_map.begin();
 						MCitr != _MC_Proc_map.end();
 						MCitr++)
 				{
 					if (MCitr->second)
-						continue;
+					{
+						if (!cleaninactive || MCitr->second->_cpu != 0)
+							continue;
+						MCitr->second = NULL;
+					}
 					float speed = (float) random() / (float) RAND_MAX + 0.2;
 					MCitr->first->resetLRU();
 					MCitr->first->add_setattr_event(false,false,false, scr.curs_attr_green());
