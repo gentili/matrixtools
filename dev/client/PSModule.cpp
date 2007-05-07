@@ -285,8 +285,27 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 		
 		while (!_curchars.empty())
 		{
+			// Exit char
 			if (_curchars.front() == 'x')
 				_terminate = true;
+			// Clear dead processes
+			if (_curchars.front() == 'd')
+			{
+				for (std::map<MatrixColumn *, Proc *>::iterator MCitr = _MC_Proc_map.begin();
+						MCitr != _MC_Proc_map.end();
+						MCitr++)
+				{
+					if (MCitr->second)
+						continue;
+					float speed = (float) random() / (float) RAND_MAX + 0.2;
+					MCitr->first->resetLRU();
+					MCitr->first->add_setattr_event(false,false,false, scr.curs_attr_green());
+					MCitr->first->add_setstring_event(false,false,false," ");
+					MCitr->first->add_stringdrop_event(false,false,false,
+							speed,(int) scr.maxy(),false, scr.curs_attr_white());
+				}
+			}
+					
 			_curchars.pop_front();
 		}
 	}
