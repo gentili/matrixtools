@@ -305,7 +305,8 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 
 					float speed = (float) random() / (float) RAND_MAX * 0.5 + 0.5;
 					MCitr->first->resetLRU();
-					MCitr->first->add_stringdrop_event(true,false,false,
+					MCitr->first->add_clear_event(true,false,false);
+					MCitr->first->add_stringdrop_event(false,false,false,
 							speed,
 							(int) scr.maxy() < (int) strlen(MCitr->second->_buf) ? scr.maxy() : strlen(MCitr->second->_buf),
 							false,scr.curs_attr_bold() | scr.curs_attr_white());
@@ -324,7 +325,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 							continue;
 						MCitr->second = NULL;
 					}
-					float speed = (float) random() / (float) RAND_MAX + 0.2;
+					float speed = (float) random() / (float) RAND_MAX * 0.5 + 0.5;
 					MCitr->first->resetLRU();
 					MCitr->first->add_setattr_event(false,false,false, scr.curs_attr_green());
 					MCitr->first->add_setstring_event(false,false,false," ");
