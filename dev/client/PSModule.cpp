@@ -98,6 +98,12 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			if (procitr == _pid_Proc_map.end())
 			{
 				procitr = _pid_Proc_map.insert(std::pair<int, Proc>(ptsk->tid,Proc(ptsk))).first;
+				char cmd[1024];
+				int cmdlen = 1024;
+				escape_command(cmd,procitr->second._ptsk,1024,&cmdlen,ESC_ARGS);
+				snprintf (procitr->second._buf, 1024, "%d %s *** ",
+						procitr->second._ptsk->tid,
+						cmd);
 				//fprintf (log, "Mark New: %d\n",procitr->first);
 			} else
 			// if exists
@@ -148,20 +154,13 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				// If proc is dead, do a reset and flash fill of
 				// the column, set the proc pointer to null
 				// and give it zero cpu
-				char buf[1024];
-				char cmd[1024];
-				int cmdlen = 1024;
-				escape_command(cmd,MCitr->second->_ptsk,1024,&cmdlen,ESC_ARGS);
-				snprintf (buf, 1024, "%d %s *** ",
-						MCitr->second->_ptsk->tid,
-						cmd);
 
 				MCitr->first->resetLRU();
 				MCitr->first->add_setattr_event(true,false,false,scr.curs_attr_reverse() | scr.curs_attr_red());
 				MCitr->first->add_clear_event(false, false, false);
 				MCitr->first->add_delay_event(false,false,false,5);
 				MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_bold() | scr.curs_attr_red());
-				MCitr->first->add_setstring_event(false,false,false,buf);
+				MCitr->first->add_setstring_event(false,false,false,MCitr->second->_buf);
 				MCitr->first->add_stringfill_event(false,false,false);
 				MCitr->second = NULL;
 
@@ -233,18 +232,10 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			assert (MCProcitr != _MC_Proc_map.end());
 			MCProcitr->second = procitr->second;
 
-
 			// Now pop the lowest speed MC
-			_LRU_MC_map.erase(LRUMCitr--);
+			_LRU_MC_map.erase(LRUMCitr);
 			
-			// Set the string
-			char buf[1024];
-			char cmd[1024];
-			int cmdlen = 1024;
-			escape_command(cmd,procitr->second->_ptsk,1024,&cmdlen,ESC_ARGS);
-			snprintf (buf, 1024, "%d %s *** ",
-					procitr->second->_ptsk->tid,
-					cmd);
+			// Set the attributes
 			int newattr = scr.curs_attr_bold();
 			if (procitr->second->_pnew)
 			{
@@ -257,9 +248,10 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			MCProcitr->first->resetLRU();
 			MCProcitr->first->add_setattr_event(true,false,false, newattr);
 			MCProcitr->first->add_clear_event(false,false,false);
-			MCProcitr->first->add_setstring_event(false,false,false,buf);
+			MCProcitr->first->add_setstring_event(false,false,false,MCProcitr->second->_buf);
 			MCProcitr->first->add_stringdrop_event(false,false,false,
-					1,(int) scr.maxy() < (int) strlen(buf) ? scr.maxy() : strlen(buf),false, scr.curs_attr_bold() | scr.curs_attr_white());
+					1,(int) scr.maxy() < (int) strlen(MCProcitr->second->_buf) ? scr.maxy() : strlen(MCProcitr->second->_buf),
+					false, scr.curs_attr_bold() | scr.curs_attr_white());
 				
 		}
 		// OK, now do the checkin for input and sleepin thing
@@ -292,10 +284,34 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			bool cleandead = false;
 			if (_curchars.front() == 'd')
 				cleandead = true;
+			// Redraw all processes
+			bool redraw = false;
+			if (_curchars.front() == 'r')
+				redraw = true;
 			// Clear all inactive processes
 			bool cleaninactive = false;
 			if (_curchars.front() == 'c')
 				cleaninactive = true;
+
+			// Redraw processing
+			if (redraw)
+			{
+				for (std::map<MatrixColumn *, Proc *>::iterator MCitr = _MC_Proc_map.begin();
+						MCitr != _MC_Proc_map.end();
+						MCitr++)
+				{
+					if (!MCitr->second)
+						continue;
+
+					float speed = (float) random() / (float) RAND_MAX * 0.5 + 0.5;
+					MCitr->first->resetLRU();
+					MCitr->first->add_stringdrop_event(true,false,false,
+							speed,
+							(int) scr.maxy() < (int) strlen(MCitr->second->_buf) ? scr.maxy() : strlen(MCitr->second->_buf),
+							false,scr.curs_attr_bold() | scr.curs_attr_white());
+				}
+			}
+			// Clean processing
 			if (cleaninactive || cleandead)
 			{
 				for (std::map<MatrixColumn *, Proc *>::iterator MCitr = _MC_Proc_map.begin();

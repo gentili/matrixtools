@@ -19,6 +19,7 @@ public:
 	proc_t * _ptsk;
 	float _cpu;
 	unsigned long long _tics;
+	char _buf[1024];
 };
 
 class PSModule : public AbstractModule {
