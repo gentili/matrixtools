@@ -83,7 +83,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 		}
 
 		// Do proc list processing
-		PROCTAB* PT = openproc(PROC_FILLARG|PROC_FILLCOM|PROC_FILLMEM|PROC_FILLSTAT);
+		PROCTAB* PT = openproc(PROC_FILLARG|PROC_FILLCOM|PROC_FILLUSR|PROC_FILLSTAT);
 		proc_t * ptsk;
 		while ( (ptsk = readproc(PT, NULL)) )
 		{
@@ -101,8 +101,9 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				char cmd[1024];
 				int cmdlen = 1024;
 				escape_command(cmd,procitr->second._ptsk,1024,&cmdlen,ESC_ARGS);
-				snprintf (procitr->second._buf, 1024, "%d %s *** ",
+				snprintf (procitr->second._buf, 1024, "%d %s %s *** ",
 						procitr->second._ptsk->tid,
+						procitr->second._ptsk->euser,
 						cmd);
 				//fprintf (log, "Mark New: %d\n",procitr->first);
 			} else
