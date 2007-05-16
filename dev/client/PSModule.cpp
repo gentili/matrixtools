@@ -171,6 +171,21 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			} else
 			{
 				//fprintf (log, "MC ALIVE: %p : %d : %f\n",MCitr->first,MCitr->second->_ptsk->tid, MCitr->second->_cpu);
+				// If the process is running real hot, throw in some flashes
+				if (MCitr->second->_cpu > 25.0)
+				{
+					int flashcount = random() % 5 + 2;
+					MCitr->first->add_setattr_event(true,false,false,scr.curs_attr_reverse() | scr.curs_attr_green());
+					for (int i = 0; i < flashcount; i++)
+					{
+						MCitr->first->add_stringfill_event(false,false,false);
+						MCitr->first->add_delay_event(false,false,false,random() % 3 + 1);
+						MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_bold() | scr.curs_attr_yellow());
+						MCitr->first->add_stringfill_event(false,false,false);
+						MCitr->first->add_delay_event(false,false,false,random() % 3 + 2);
+						MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_reverse() | scr.curs_attr_green());
+					}
+				}
 				// Then adjust the update rate accordingly
 				MCitr->first->add_setattr_event(false,false,false, 
 						scr.curs_attr_green());
