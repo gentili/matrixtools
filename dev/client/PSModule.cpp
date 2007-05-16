@@ -178,13 +178,17 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 					MCitr->first->add_setattr_event(true,false,false,scr.curs_attr_reverse() | scr.curs_attr_green());
 					for (int i = 0; i < flashcount; i++)
 					{
-						MCitr->first->add_stringfill_event(false,false,false);
-						MCitr->first->add_delay_event(false,false,false,random() % 3 + 1);
+						MCitr->first->add_stringdrop_event(false,false,false,
+								MCitr->second->_cpu*0.1,strlen(MCitr->second->_buf),true,
+								scr.curs_attr_reverse() | scr.curs_attr_white());
 						MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_bold() | scr.curs_attr_yellow());
-						MCitr->first->add_stringfill_event(false,false,false);
-						MCitr->first->add_delay_event(false,false,false,random() % 3 + 2);
+						MCitr->first->add_stringdrop_event(false,false,false,
+								MCitr->second->_cpu*0.1,strlen(MCitr->second->_buf),true,
+								scr.curs_attr_reverse() | scr.curs_attr_white());
 						MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_reverse() | scr.curs_attr_green());
 					}
+					MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_bold() | scr.curs_attr_yellow());
+					MCitr->first->add_stringfill_event(false,false,false);
 				}
 				// Then adjust the update rate accordingly
 				MCitr->first->add_setattr_event(false,false,false, 
