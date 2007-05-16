@@ -179,11 +179,11 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 					for (int i = 0; i < flashcount; i++)
 					{
 						MCitr->first->add_stringdrop_event(false,false,false,
-								MCitr->second->_cpu*0.1,strlen(MCitr->second->_buf),true,
+								10,strlen(MCitr->second->_buf),true,
 								scr.curs_attr_reverse() | scr.curs_attr_white());
 						MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_bold() | scr.curs_attr_yellow());
 						MCitr->first->add_stringdrop_event(false,false,false,
-								MCitr->second->_cpu*0.1,strlen(MCitr->second->_buf),true,
+								10,strlen(MCitr->second->_buf),true,
 								scr.curs_attr_reverse() | scr.curs_attr_white());
 						MCitr->first->add_setattr_event(false,false,false,scr.curs_attr_reverse() | scr.curs_attr_green());
 					}
@@ -270,7 +270,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			MCProcitr->first->add_clear_event(false,false,false);
 			MCProcitr->first->add_setstring_event(false,false,false,MCProcitr->second->_buf);
 			MCProcitr->first->add_stringdrop_event(false,false,false,
-					1,(int) scr.maxy() < (int) strlen(MCProcitr->second->_buf) ? scr.maxy() : strlen(MCProcitr->second->_buf),
+					1.5,(int) scr.maxy() < (int) strlen(MCProcitr->second->_buf) ? scr.maxy() : strlen(MCProcitr->second->_buf),
 					false, scr.curs_attr_bold() | scr.curs_attr_white());
 				
 		}
