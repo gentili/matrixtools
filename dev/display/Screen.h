@@ -125,4 +125,19 @@ protected:
 private:
 };
 
+class XYSwapScreen : public Screen {
+public:
+	void curs_move(int x, int y)	{ wmove(_stdscr, y, x); }
+	void curs_addch(char ch)	{ waddch(_stdscr, ch); }
+	void curs_mvaddch(int x, int y, char ch)
+					{ mvwaddch(_stdscr, y, x, ch); }
+	void curs_mvaddstr(int x, int y, char * str)
+					{ mvwaddstr(_stdscr, y, x, str); }
+	void curs_mvchgat(int x, int y, int n, int newattr)
+					{ mvwchgat(_stdscr, y, x, n, (attr_t) newattr, 0, NULL); }
+//	int maxy()		{ return _maxx; }
+//	int maxx()		{ return _maxy; }
+
+};
+
 #endif

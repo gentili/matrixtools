@@ -61,7 +61,7 @@ int main (int argc, char * argv[])
 	}
 	
 	// OK, set up the screen
-	Screen scr;
+	XYSwapScreen scr;
 
 	// Init the screen singleton
 	if (!scr.init(TEST_CYCLEFREQ, &processchar))

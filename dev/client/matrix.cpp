@@ -63,10 +63,10 @@ int main (int argc, char * argv[])
 	}
 
 	// Check that screen params are doable
-	if ((scr.maxx() < 64) || (scr.maxy() < 15))
+	if ((scr.maxx() < 20) || (scr.maxy() < 15))
 	{
 		scr.cleanup();
-		printf ("ERROR: Screen must be at least 64x15\n"); 
+		printf ("ERROR: Screen must be at least 10x15\n"); 
 		exit (1);
 	}
 		
