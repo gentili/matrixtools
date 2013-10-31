@@ -5,7 +5,7 @@
 #include <map>
 
 // Foreign includes
-#include "readproc.h"
+#include <proc/readproc.h>
 
 // Local Includes
 #include "AbstractModule.h"

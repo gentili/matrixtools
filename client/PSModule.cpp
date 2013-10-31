@@ -4,11 +4,12 @@
 #include <stdio.h>
 #include <signal.h>
 #include <math.h>
+#include <assert.h>
 
 // Foreign includes
-#include "readproc.h"
-#include "sysinfo.h"
-#include "escape.h"
+#include <proc/readproc.h>
+#include <proc/sysinfo.h>
+#include <proc/escape.h>
 
 // Local Includes
 #include "Screen.h"

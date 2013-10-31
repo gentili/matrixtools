@@ -1,9 +1,9 @@
 
-LIBS=	-lncurses -lutility -ldisplay -lpthread -lproc-3.2.7
+LIBS=	-lutility -ldisplay -lpthread -lproc -lncurses
 
-LIBDIRS=	-L../utility -L../display -L/lib -L/home/gentili/software/procps-3.2.7/proc
+LIBDIRS=	-L../utility -L../display 
 
-INCDIRS=	-I../utility -I../display -I../server -I/home/gentili/software/procps-3.2.7/proc
+INCDIRS=	-I../utility -I../display -I../server
 
 # -----------------------
 ALL_TARGETS= matrix 

@@ -1,6 +1,7 @@
 // System includes
 #include <curses.h>
 #include <math.h>
+#include <assert.h>
 
 // Local includes
 #include "MatrixColumn.h"
