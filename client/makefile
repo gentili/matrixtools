@@ -1,5 +1,5 @@
 
-LIBS=	-lutility -ldisplay -lpthread -lproc -lncurses
+LIBS=	-lutility -ldisplay -lpthread -lprocps -lncurses
 
 LIBDIRS=	-L../utility -L../display 
 
