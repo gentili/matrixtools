@@ -76,7 +76,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				procitr != _pid_Proc_map.end();
 				procitr++)
 		{
-			//fprintf (log, "Mark OldDead: %d\n",procitr->first);
+			// fprintf (log, "Mark OldDead: %d\n",procitr->first);
 			assert (procitr->first == procitr->second._ptsk->tid);
 			procitr->second._pnew = false;
 			procitr->second._palive = false;
@@ -106,7 +106,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 						procitr->second._ptsk->tid,
 						procitr->second._ptsk->euser,
 						cmd);
-				//fprintf (log, "Mark New: %d\n",procitr->first);
+				// fprintf (log, "Mark New: %d %s %f\n",procitr->first,cmd,procitr->second._cpu);
 			} else
 			// if exists
 			{
@@ -152,7 +152,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				
 			} else if (!MCitr->second->_palive)
 			{
-				//fprintf (log, "MC DIED: %p : %d\n",MCitr->first,MCitr->second->_ptsk->tid);
+				// fprintf (log, "MC DIED: %p : %d\n",MCitr->first,MCitr->second->_ptsk->tid);
 				// If proc is dead, do a reset and flash fill of
 				// the column, set the proc pointer to null
 				// and give it zero cpu
@@ -171,7 +171,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 				_LRU_MC_map.insert(std::pair < int, MatrixColumn * > (MCitr->first->getLRU(),MCitr->first));
 			} else
 			{
-				//fprintf (log, "MC ALIVE: %p : %d : %f\n",MCitr->first,MCitr->second->_ptsk->tid, MCitr->second->_cpu);
+				// fprintf (log, "MC ALIVE: %p : %d : %f\n",MCitr->first,MCitr->second->_ptsk->tid, MCitr->second->_cpu);
 				// If the process is running real hot, throw in some flashes
 				if (MCitr->second->_cpu > 25.0)
 				{
@@ -214,7 +214,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 			procitr++;
 			if (!deaditr->second._palive)
 			{
-				//fprintf (log, "PROC DEAD: %d\n",procitr->first);
+				// fprintf (log, "PROC DEAD: %d\n",procitr->first);
 				// Safe to do this as we're guaranteed not to be
 				// in the cpu sorted list because we're dead
 				free ((void*)*(deaditr->second._ptsk)->cmdline);
@@ -231,7 +231,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 		{
 			procitr--;
 			MCcount--;
-			//fprintf (log, "EXAMINING: %d : %f\n",procitr->second->_ptsk->tid, procitr->first);
+			// fprintf (log, "EXAMINING: %d : %f\n",procitr->second->_ptsk->tid, procitr->first);
 			// Are we down in the zero cpu processes?
 			if ((procitr->second->_cpu <= 0) && (!procitr->second->_pnew))
 				// Then to avoid bottom feeder thrashing
@@ -357,6 +357,7 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
 					
 			_curchars.pop_front();
 		}
+        // fflush(log);
 	}
 
 	return NULL;

@@ -12,7 +12,7 @@
 
 class Proc {
 public:
-	Proc(proc_t * ptsk) : _pnew(true), _palive(true), _ptsk(ptsk), _cpu(0) {}
+	Proc(proc_t * ptsk) : _pnew(true), _palive(true), _ptsk(ptsk), _cpu(1) {}
 
 	bool _pnew;
 	bool _palive;
