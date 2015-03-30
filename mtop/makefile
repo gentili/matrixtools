@@ -6,7 +6,7 @@ LIBDIRS=	-L../utility -L../display
 INCDIRS=	-I../utility -I../display -I../server
 
 # -----------------------
-ALL_TARGETS= matrix 
+ALL_TARGETS= mtop 
 include ../makefile.in
 # -----------------------
 
@@ -15,5 +15,5 @@ CFLAGS +=
 
 OFILES =
 
-matrix: matrix.o PSModule.o
+mtop: main.o PSModule.o
 	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)

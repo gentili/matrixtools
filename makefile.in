@@ -9,9 +9,6 @@ CFLAGS = -Wall -g
 all: $(ALL_TARGETS)
 
 clean:
-	@echo " "
-	@echo "*** cleaning ***"
-	@echo " "
 	-rm -f $(ALL_TARGETS); rm -f *.o
 
 %.o : %.cpp
