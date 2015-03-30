@@ -14,22 +14,22 @@
 // Local Includes
 #include "Screen.h"
 #include "MatrixColumn.h"
-#include "PSModule.h"
+#include "MatrixTop.h"
 
-PSModule::PSModule()
+MatrixTop::MatrixTop()
 {
 	pthread_mutex_init(&_lock, NULL);
 	pthread_cond_init(&_cond, NULL);
 }
 
-PSModule::~PSModule()
+MatrixTop::~MatrixTop()
 {
 	pthread_mutex_destroy(&_lock);
 	pthread_cond_destroy(&_cond);
 }
 
 // AbstractModule Interface specification
-void PSModule::processchar (int c)
+void MatrixTop::processchar (int c)
 {
 	pthread_mutex_lock(&_lock);
 	_charqueue.push_back(c);
@@ -38,7 +38,7 @@ void PSModule::processchar (int c)
 }
 
 
-void PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & MClist)
+void MatrixTop::execute(Screen & scr, std::vector<MatrixColumn *> & MClist)
 {
 	// FILE * log = fopen ("PSMatrix.log", "w+");
 	// Seed the MC maps

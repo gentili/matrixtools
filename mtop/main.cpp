@@ -7,7 +7,7 @@
 // Local Includes
 #include "Screen.h"
 #include "MatrixColumn.h"
-#include "PSModule.h"
+#include "MatrixTop.h"
 
 // Local Defines
 #define CYCLEFREQ	30
@@ -26,7 +26,7 @@
 	nanosleep (&ts, NULL); \
 } while (0);
 
-PSModule * mtop = NULL;
+MatrixTop * mtop = NULL;
 
 void processchar (int c)
 {
@@ -90,7 +90,7 @@ int main (int argc, char * argv[])
 	// Start things up
 	
 	scr.startUpdates();
-	mtop = new PSModule();
+	mtop = new MatrixTop();
 	mtop->execute(scr, MClist);  // App entry point
 	delete (mtop);
 	scr.stopUpdates();

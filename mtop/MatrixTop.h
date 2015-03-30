@@ -1,5 +1,5 @@
-#ifndef PSMODULE_H
-#define PSMODULE_H
+#ifndef MATRIXTOP_H 
+#define MATRIXTOP_H
 
 // System includes
 #include <map>
@@ -19,10 +19,10 @@ public:
 	char _buf[1024];
 };
 
-class PSModule {
+class MatrixTop {
 public:
-	PSModule();
-	virtual ~PSModule();
+	MatrixTop();
+	virtual ~MatrixTop();
 
 	// regular members
 	virtual void processchar(int c);

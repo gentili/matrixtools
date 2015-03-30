@@ -15,5 +15,5 @@ CFLAGS +=
 
 OFILES =
 
-mtop: main.o PSModule.o
+mtop: main.o MatrixTop.o
 	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
