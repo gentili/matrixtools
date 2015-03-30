@@ -88,7 +88,7 @@ public:
 	void add_clear_event(bool override, bool skipable, bool compressable);
 	void add_setattr_event(bool override, bool skipable, bool compressable, int newattrs);
 	void add_setattr_event(bool override, bool skipable, bool compressable, std::vector<int> & newattrvec);
-	void add_setstring_event(bool override, bool skipable, bool compressable, char * newstr);
+	void add_setstring_event(bool override, bool skipable, bool compressable, const char * newstr);
 	void add_stringfill_event(bool override, bool skipable, bool compressable);
 	void add_stringdrop_event(bool override, bool skipable, bool compressable, float speed, int charcount, bool cont, int headcharattr);
 
@@ -194,7 +194,7 @@ protected:
 
 class MCE_SetString : public MatrixColumnEvent {
 public:
-	MCE_SetString(char * newstr);
+	MCE_SetString(const char * newstr);
 
 	virtual ~MCE_SetString() { return; }
 

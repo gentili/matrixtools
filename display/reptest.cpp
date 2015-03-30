@@ -90,7 +90,6 @@ int main (int argc, char * argv[])
 	// TEST - MCE_RepScript
 	std::vector<MatrixColumn *>::iterator MCitr = MClist.begin();
 	float speed = 0;
-	int newattr = scr.curs_attr_green();
 	i = 0;
 	std::vector<int> counts;
 	std::vector<int> headattrs;

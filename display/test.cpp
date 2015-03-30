@@ -88,8 +88,9 @@ int main (int argc, char * argv[])
 		MClist.push_back(newmcol);
 	}
 	
+	char strtmp[] = "TEST - Staggered MCE_Delay and MCE_Clear";
 	for (int i = 0; i < scr.maxy(); i++)
-		scr.curs_mvaddstr(i, 20, "TEST - Staggered MCE_Delay and MCE_Clear");
+		scr.curs_mvaddstr(i, 20, strtmp); 
 	
 	// Start the screen update thread
 	time_t startime = time(NULL);

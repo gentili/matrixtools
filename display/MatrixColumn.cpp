@@ -182,7 +182,7 @@ void MatrixColumn::add_setattr_event(bool override, bool skipable, bool compress
 	}
 }
 
-void MatrixColumn::add_setstring_event(bool override, bool skipable, bool compressable, char * newstr)
+void MatrixColumn::add_setstring_event(bool override, bool skipable, bool compressable, const char * newstr)
 {
 	MCE_SetString * newe = new MCE_SetString(newstr);
 	newe->_skipable = skipable;
@@ -334,7 +334,7 @@ void MCE_SetAttr::compress(MatrixColumn * mc, Screen * curscr)
 
 //// MCE_SetString
 
-MCE_SetString::MCE_SetString(char * newstr)
+MCE_SetString::MCE_SetString(const char * newstr)
 {
 	// Make a copy of the new string
 	memset (_newstr, 0, MC_MAX_STR);
