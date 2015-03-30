@@ -38,7 +38,7 @@ void PSModule::processchar (int c)
 }
 
 
-AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & MClist)
+void PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & MClist)
 {
 	// FILE * log = fopen ("PSMatrix.log", "w+");
 	// Seed the MC maps
@@ -360,5 +360,5 @@ AbstractModule * PSModule::execute(Screen & scr, std::vector<MatrixColumn *> & M
         // fflush(log);
 	}
 
-	return NULL;
+	return;
 }

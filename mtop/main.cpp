@@ -7,7 +7,6 @@
 // Local Includes
 #include "Screen.h"
 #include "MatrixColumn.h"
-#include "AbstractModule.h"
 #include "PSModule.h"
 
 // Local Defines
@@ -27,12 +26,12 @@
 	nanosleep (&ts, NULL); \
 } while (0);
 
-AbstractModule * curmod = NULL;
+PSModule * mtop = NULL;
 
 void processchar (int c)
 {
-	if (curmod != NULL)
-		curmod->processchar(c);
+	if (mtop != NULL)
+		mtop->processchar(c);
 }
 
 int main (int argc, char * argv[])
@@ -88,22 +87,13 @@ int main (int argc, char * argv[])
 		MCitr++;
 	}
 
-	// Start with a process module
-	curmod = new PSModule();
+	// Start things up
 	
-	////////////////////////
-	// MAIN LOOP
-	////////////////////////
-	// Cross State variables
-	while (curmod != NULL)
-	{
-		AbstractModule * nextmod = NULL;
-		scr.startUpdates();
-		nextmod = curmod->execute(scr, MClist);
-		scr.stopUpdates();
-		delete (curmod);
-		curmod = nextmod;
-	}
+	scr.startUpdates();
+	mtop = new PSModule();
+	mtop->execute(scr, MClist);  // App entry point
+	delete (mtop);
+	scr.stopUpdates();
 
 	// cleanup the screen
 	scr.cleanup();

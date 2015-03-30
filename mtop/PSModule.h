@@ -7,9 +7,6 @@
 // Foreign includes
 #include <proc/readproc.h>
 
-// Local Includes
-#include "AbstractModule.h"
-
 class Proc {
 public:
 	Proc(proc_t * ptsk) : _pnew(true), _palive(true), _ptsk(ptsk), _cpu(1) {}
@@ -22,7 +19,7 @@ public:
 	char _buf[1024];
 };
 
-class PSModule : public AbstractModule {
+class PSModule {
 public:
 	PSModule();
 	virtual ~PSModule();
@@ -30,7 +27,7 @@ public:
 	// regular members
 	virtual void processchar(int c);
 
-	virtual AbstractModule * execute(Screen & scr, std::vector<MatrixColumn *> & MClist);
+	virtual void execute(Screen & scr, std::vector<MatrixColumn *> & MClist);
 
 private:
 	// Locking waffle
