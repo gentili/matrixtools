@@ -4,7 +4,6 @@
 // Local Includes
 #include "Screen.h"
 #include "MatrixColumn.h"
-#include "ResType.h"
 
 class AbstractModule {
 public:

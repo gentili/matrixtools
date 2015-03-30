@@ -1,5 +1,0 @@
-ps for processes
-
-lsof for files
-
-netstat for network connections
