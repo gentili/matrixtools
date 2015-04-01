@@ -1,12 +1,12 @@
 
-LIBS=	-lutility -ldisplay -lpthread -lprocps -lncurses
+LIBS=	-lutility -ldisplay -lpthread -lprocps -lncurses -ltinfo
 
-LIBDIRS=	-L../utility -L../display 
+LIBDIRS=	-L../utility -L../display
 
 INCDIRS=	-I../utility -I../display -I../server
 
 # -----------------------
-ALL_TARGETS= mtop 
+ALL_TARGETS= mtop
 include ../makefile.in
 # -----------------------
 
