@@ -20,7 +20,7 @@ int Screen::_colortbl[8];
 
 float Screen::_updatefreq = 0;
 struct timespec Screen::_updateperiod;
-void * Screen::_charprocfunc = NULL;
+std::function<void(int)> Screen::_charprocfunc;
 
 int Screen::_updatecounter = 0;
 
@@ -36,7 +36,7 @@ std::atomic_bool Screen::_exit(false);
 ///// Singleton Control Functions
 /////////////////////////////////////
 
-bool Screen::init(float updatefreq, void (* charprocfunc) (int))
+bool Screen::init(float updatefreq, std::function<void(int)>&&charprocfunc)
 {
 #ifdef DEBUG
 	char	tmpbuf[256];
@@ -46,7 +46,7 @@ bool Screen::init(float updatefreq, void (* charprocfunc) (int))
 		return false;
 
 	// Assign character processing callback
-	_charprocfunc = (void *) charprocfunc;
+	_charprocfunc = charprocfunc;
 
 	// Figure out update frequency dependent stuff
 	if (updatefreq < 0)
@@ -318,8 +318,8 @@ void Screen::run()
 		int newchar;
 		while ((newchar = wgetch(_stdscr)) != ERR)
 		{
-			if (_charprocfunc != NULL)
-				(* (void (*) (int)) _charprocfunc) (newchar);
+			if (_charprocfunc)
+				_charprocfunc (newchar);
 		}
 		
 		gettimeofday(&now,NULL);

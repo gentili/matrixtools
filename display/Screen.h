@@ -7,6 +7,7 @@
 #include <vector>
 #include <thread>
 #include <atomic>
+#include <functional>
 
 // Local includes
 
@@ -42,7 +43,7 @@ public:
 	
 	// Init grabs control of the tty, reads in all the specs,
 	// and generally sets everything up to start updating the display
-	bool init(float updatefreq, void (* charprocfunc) (int));
+	bool init(float updatefreq, std::function<void(int)>&&);
 
 	// This starts the screen update processing thread
 	bool startUpdates();
@@ -109,7 +110,7 @@ protected:
 	// Config variables
 	static float _updatefreq;
 	static struct timespec _updateperiod;
-	static void * _charprocfunc;
+	static std::function<void(int)> _charprocfunc;
 
 	// Current Screen state
 	static int _updatecounter;
