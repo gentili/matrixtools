@@ -1,9 +1,9 @@
 
-LIBS=	-lutility -ldisplay -lpthread -lprocps -lncurses -ltinfo
+LIBS= -ldisplay -pthread -lpthread -lprocps -lncurses -ltinfo
 
-LIBDIRS=	-L../utility -L../display
+LIBDIRS= -L../display
 
-INCDIRS=	-I../utility -I../display -I../server
+INCDIRS= -I../display
 
 # -----------------------
 ALL_TARGETS= mtop
