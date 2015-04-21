@@ -29,6 +29,8 @@ std::vector<Artifact *> Screen::_artifactList;
 pthread_mutex_t Screen::_updatelock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t Screen::_updatecond = PTHREAD_COND_INITIALIZER;
 
+std::thread Screen::_thread;
+
 /////////////////////////////////////
 ///// Singleton Control Functions
 /////////////////////////////////////
@@ -162,31 +164,27 @@ bool Screen::init(float updatefreq, void (* charprocfunc) (int))
 
 bool Screen::startUpdates()
 {
-	if (!_inited || threads() > 0)
+	if (!_inited || _thread.joinable())
 		return false;
 
-	createThreads();
+        _thread = std::thread(&Screen::run,this);
 	return true;
 }
 
 bool Screen::stopUpdates()
 {
-	if (!_inited || (threads() <= 0))
+	if (!_inited || !_thread.joinable())
 		return false;
 
 	terminate();
-	while (threads() > 0)
-	{
-		// FIXME: Put a thread safe nanosleep here
-		// or something to stop the useless spinning
-	}
+        _thread.join();
 	return true;
 }
 
 	
 bool Screen::cleanup()
 {
-	if (!_inited || (threads() > 0))
+	if (!_inited || _thread.joinable())
 		return false;
 
 	endwin();

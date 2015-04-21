@@ -1,10 +1,10 @@
-#ifndef SCREEN_H
-#define SCREEN_H
+#pragma once
 
 // System includes
 #include <ncurses.h>
 #include <algorithm>
 #include <vector>
+#include <thread>
 
 // Foreign includes
 #include "MTObject.h"
@@ -122,6 +122,8 @@ protected:
 	static pthread_mutex_t _updatelock;
 	static pthread_cond_t _updatecond;
 
+        static std::thread _thread;
+
 private:
 };
 
@@ -139,5 +141,3 @@ public:
 //	int maxx()		{ return _maxy; }
 
 };
-
-#endif

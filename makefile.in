@@ -3,7 +3,7 @@ CC = g++
 MAKE = gmake
 SHELL = /bin/bash
 
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -std=c++11
 
 # General rules
 all: $(ALL_TARGETS)
