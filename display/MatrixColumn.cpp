@@ -44,9 +44,7 @@ void MatrixColumn::render(Screen * curscr)
 
 	bool terminate = false;
 	pthread_mutex_lock(&_equeue_lock);
-	_lru++;
-	if (_lru < 0)
-		_lru = 0;
+	_lru++; // atomic
 	// Is there anything in the queue?
 	while (!terminate && !_equeue.empty())
 	{

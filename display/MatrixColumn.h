@@ -4,6 +4,7 @@
 // System Includes
 #include <deque>
 #include <pthread.h>
+#include <atomic>
 
 // Local Includes
 #include "Screen.h"
@@ -62,17 +63,12 @@ public:
 	virtual void render(Screen * curscr);
 
 	//// Class specific interface (user calls)
-	int getLRU() { 
-		pthread_mutex_lock(&_equeue_lock);
-		int lru = _lru;
-		pthread_mutex_unlock(&_equeue_lock);
-		return lru;
+	long getLRU() { 
+		return _lru.load();
 	}
 
 	void resetLRU() {
-		pthread_mutex_lock(&_equeue_lock);
-		_lru = 0;
-		pthread_mutex_unlock(&_equeue_lock);
+		_lru.store(0);
 	}
 	
 	// Script manipulators
@@ -122,7 +118,7 @@ protected:
 	// Event Queue Stuff
 	pthread_mutex_t	 _equeue_lock;	// Event queue access lock
 	std::deque<MatrixColumnEvent *> _equeue;	// Event queue
-	int	_lru;
+        std::atomic_long _lru;
 
 	friend class MCE_Delay;
 	friend class MCE_Clear;
