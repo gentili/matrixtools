@@ -84,7 +84,7 @@ public:
 	void curs_mvaddstr(int y, int x, char * str)
 					{ mvwaddstr(_stdscr, y, x, str); }
 	void curs_mvchgat(int y, int x, int n, int newattr)
-					{ mvwchgat(_stdscr, y, x, n, (attr_t) newattr, 0, NULL); }
+					{ mvwchgat(_stdscr, y, x, n, static_cast<attr_t>(newattr), 0, NULL); }
 
 	//// Member accessors
 	int maxy() 		{ return _maxy; }
@@ -136,7 +136,7 @@ public:
 	void curs_mvaddstr(int x, int y, char * str)
 					{ mvwaddstr(_stdscr, y, x, str); }
 	void curs_mvchgat(int x, int y, int n, int newattr)
-					{ mvwchgat(_stdscr, y, x, n, (attr_t) newattr, 0, NULL); }
+					{ mvwchgat(_stdscr, y, x, n, static_cast<attr_t> (newattr), 0, NULL); }
 //	int maxy()		{ return _maxx; }
 //	int maxx()		{ return _maxy; }
 

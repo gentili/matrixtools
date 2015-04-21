@@ -97,7 +97,7 @@ void MatrixColumn::add_multitone_stringdrop_script(std::vector<float> & speeds,
 		throw;
 
 	std::vector<MatrixColumnEvent *> eventlist;
-	for (int i = 0; i < (int) counts.size(); i++)
+	for (int i = 0; i < static_cast<int> (counts.size()); i++)
 	{
 		// Put in SA event
 		MCE_SetAttr * newsa = new MCE_SetAttr(colattrs[i]);
@@ -263,6 +263,8 @@ bool MCE_Delay::render(MatrixColumn * mc, Screen * curscr)
 	char ch = '0';
 	ch += (_duration % 10);
 	curscr->curs_mvaddch(1, mc->_column, ch);
+#else
+        (void)mc; // Avoid unused param warning
 #endif
 	int cycle = curscr->updatecounter();
 	if (_lastcycle == -1)
@@ -317,14 +319,14 @@ MCE_SetAttr::MCE_SetAttr(std::vector<int> & newattrvec)
 	_newattrvec = newattrvec;
 }
 
-bool MCE_SetAttr::render(MatrixColumn * mc, Screen * curscr)
+bool MCE_SetAttr::render(MatrixColumn * mc, Screen * )
 {
 	mc->_curattrs = _newattr;
 	mc->_curattrvec = _newattrvec;
 	return false;
 }
 
-void MCE_SetAttr::compress(MatrixColumn * mc, Screen * curscr)
+void MCE_SetAttr::compress(MatrixColumn * mc, Screen * )
 {
 	mc->_curattrs = _newattr;
 	mc->_curattrvec = _newattrvec;
@@ -339,14 +341,14 @@ MCE_SetString::MCE_SetString(const char * newstr)
 	strncpy (_newstr, newstr, MC_MAX_STR - 1);
 }
 
-bool MCE_SetString::render(MatrixColumn * mc, Screen * curscr)
+bool MCE_SetString::render(MatrixColumn * mc, Screen * )
 {
 	strncpy (mc->_curstr, _newstr, MC_MAX_STR);
 	mc->_curstrlen = strlen(mc->_curstr);
 	return false;
 }
 
-void MCE_SetString::compress(MatrixColumn * mc, Screen * curscr)
+void MCE_SetString::compress(MatrixColumn * mc, Screen * )
 {
 	strncpy (mc->_curstr, _newstr, MC_MAX_STR);
 	mc->_curstrlen = strlen(mc->_curstr);
@@ -411,7 +413,7 @@ bool MCE_StringDrop::render(MatrixColumn * mc, Screen * curscr)
 	}
 	// OK, now we find out how many characters to output this round
 	float outtot = _speed + mc->_curfrac;
-	int outint = (int) floor(outtot);
+	int outint = static_cast<int> (floor(outtot));
 	mc->_curfrac = outtot - floor(outtot);
 	
 	// Now, if there are any characters to output, do it
@@ -430,7 +432,7 @@ bool MCE_StringDrop::render(MatrixColumn * mc, Screen * curscr)
 				curscr->curs_attr_set(mc->_curattrs);
 			} else
 			{
-				assert ((int) mc->_curattrvec.size() > mc->_curpos);
+				assert (static_cast<int> (mc->_curattrvec.size()) > mc->_curpos);
 				curscr->curs_attr_set(mc->_curattrvec[mc->_curpos]);
 			}
 			curscr->curs_mvaddch(mc->_curpos,
@@ -462,7 +464,7 @@ bool MCE_StringDrop::render(MatrixColumn * mc, Screen * curscr)
 	return true;
 }
 
-void MCE_StringDrop::compress(MatrixColumn * mc, Screen * curscr)
+void MCE_StringDrop::compress(MatrixColumn * , Screen * )
 {
 	// FIXME: Need to fill this in!
 }

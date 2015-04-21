@@ -137,7 +137,7 @@ public:
 
 	virtual bool render(MatrixColumn * mc, Screen * curscr);
 
-	virtual void compress(MatrixColumn * mc, Screen * curscr)
+	virtual void compress(MatrixColumn * , Screen * )
 				{ return; }
 
 	virtual void reset()	{ _lastcycle = -1; }
@@ -254,7 +254,7 @@ public:
 
 	virtual bool render(MatrixColumn * mc, Screen * curscr);
 	
-	virtual void compress(MatrixColumn * mc, Screen * curscr)
+	virtual void compress(MatrixColumn * , Screen * )
 				{ return; }
 
 	virtual void reset();

@@ -53,8 +53,8 @@ bool Screen::init(float updatefreq, void (* charprocfunc) (int))
 		return false;
 	
 	_updatefreq = updatefreq;
-	_updateperiod.tv_sec = (int) floor(1/updatefreq);
-	_updateperiod.tv_nsec = (int) (1000000000.0 *
+	_updateperiod.tv_sec = static_cast<int> (floor(1/updatefreq));
+	_updateperiod.tv_nsec = static_cast<int> (1000000000.0 *
 			(1/updatefreq - floor(1/updatefreq)));
 	
 	// OK, set up the terminal for operation
