@@ -30,6 +30,7 @@ pthread_mutex_t Screen::_updatelock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t Screen::_updatecond = PTHREAD_COND_INITIALIZER;
 
 std::thread Screen::_thread;
+std::atomic_bool Screen::_exit(false);
 
 /////////////////////////////////////
 ///// Singleton Control Functions
@@ -176,7 +177,7 @@ bool Screen::stopUpdates()
 	if (!_inited || !_thread.joinable())
 		return false;
 
-	terminate();
+	_exit.store(true);
         _thread.join();
 	return true;
 }
@@ -198,7 +199,7 @@ bool Screen::cleanup()
 
 bool Screen::addArtifact (Artifact * newart)
 {
-	if (!_inited || threads() > 0)
+	if (!_inited || _thread.joinable())
 		return false;
 
 	// Add the artifact
@@ -209,7 +210,7 @@ bool Screen::addArtifact (Artifact * newart)
 
 bool Screen::delArtifact(Artifact * oldart)
 {
-	if (!_inited || threads() > 0)
+	if (!_inited || _thread.joinable())
 		return false;
 
 	// Delete the artifact
@@ -228,7 +229,7 @@ bool Screen::delArtifact(Artifact * oldart)
 
 bool Screen::flushArtifacts()
 {
-	if (!_inited || threads() > 0)
+	if (!_inited || _thread.joinable())
 		return false;
 
 	// Clear out the entire artifact list
@@ -262,7 +263,7 @@ void Screen::run()
 	due.tv_sec = start.tv_sec;
 	due.tv_nsec = start.tv_usec * 1000;
 	
-	while (!shouldterminate())
+	while (!_exit.load())
 	{
 		// What time is it?
 		gettimeofday(&now,NULL);
@@ -343,5 +344,4 @@ void Screen::run()
 #endif
 
 	}
-	threadExit();
 }

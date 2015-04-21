@@ -1,9 +1,9 @@
 
-LIBS=	-lutility -ldisplay -lpthread -lncurses -ltinfo
+LIBS=	-ldisplay -lpthread -lncurses -ltinfo
 
-LIBDIRS=	-L../utility -L.
+LIBDIRS=	-L.
 
-INCDIRS=	-I../utility
+INCDIRS=	
 
 # -----------------------
 ALL_TARGETS= libdisplay.a test droptest reptest attrtest

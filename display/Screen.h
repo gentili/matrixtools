@@ -1,13 +1,12 @@
 #pragma once
 
 // System includes
+#include <string.h>
 #include <ncurses.h>
 #include <algorithm>
 #include <vector>
 #include <thread>
-
-// Foreign includes
-#include "MTObject.h"
+#include <atomic>
 
 // Local includes
 
@@ -36,7 +35,7 @@ public:
  singleton (we don't have multiple screens) and grabs the default tty
  if any. */
 
-class Screen : public MTObject
+class Screen
 {
 public:
 	//// Singleton Control Functions
@@ -123,6 +122,7 @@ protected:
 	static pthread_cond_t _updatecond;
 
         static std::thread _thread;
+        static std::atomic_bool _exit;
 
 private:
 };
