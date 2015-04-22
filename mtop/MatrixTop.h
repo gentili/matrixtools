@@ -1,11 +1,13 @@
-#ifndef MATRIXTOP_H 
-#define MATRIXTOP_H
+#pragma once
 
 // System includes
 #include <map>
 
 // Foreign includes
 #include <proc/readproc.h>
+
+// Local includes
+#include "MatrixColumn.h"
 
 class Proc {
 public:
@@ -51,5 +53,3 @@ private:
 	std::multimap<int, MatrixColumn *> _LRU_MC_map;
 	
 };
-
-#endif

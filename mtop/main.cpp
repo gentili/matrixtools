@@ -6,7 +6,6 @@
 
 // Local Includes
 #include "Screen.h"
-#include "MatrixColumn.h"
 #include "MatrixTop.h"
 
 // Local Defines
