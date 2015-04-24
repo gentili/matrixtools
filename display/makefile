@@ -6,7 +6,7 @@ LIBDIRS=	-L.
 INCDIRS=	
 
 # -----------------------
-ALL_TARGETS= libdisplay.a test droptest reptest attrtest
+ALL_TARGETS= libdisplay.a test test2 droptest reptest attrtest
 include ../makefile.in
 # -----------------------
 
@@ -19,6 +19,9 @@ libdisplay.a: $(OFILES)
 	ar vr $@ $^
 
 test: libdisplay.a test.o
+	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
+
+test2: libdisplay.a test2.o
 	$(CXX) -o $@ $(CFLAGS) $^ $(INCDIRS) $(LIBDIRS) $(LIBS)
 
 droptest: libdisplay.a droptest.o

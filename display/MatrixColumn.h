@@ -34,10 +34,10 @@ public:
 	// (as if it had never been run)
 	virtual void reset() = 0;
 	
-	// If an event is skipable, then we simply 
+	// If an event is skippable, then we simply
 	// discard it when another event shows up in
 	// the queue.
-	bool _skipable;
+	bool _skippable;
 
 	// If an event is compressable, then we get
 	// it to do all its work instantly when another
@@ -45,7 +45,7 @@ public:
 	// in the same cycle.
 	bool _compressable;
 
-	// NOTE: Skipable overrides compressable.
+	// NOTE: skippable overrides compressable.
 protected:
 
 };
@@ -80,13 +80,13 @@ public:
 
 	// Event manipulators
 	bool eventspending();
-	void add_delay_event(bool override, bool skipable, bool compressable, int duration);
-	void add_clear_event(bool override, bool skipable, bool compressable);
-	void add_setattr_event(bool override, bool skipable, bool compressable, int newattrs);
-	void add_setattr_event(bool override, bool skipable, bool compressable, std::vector<int> & newattrvec);
-	void add_setstring_event(bool override, bool skipable, bool compressable, const char * newstr);
-	void add_stringfill_event(bool override, bool skipable, bool compressable);
-	void add_stringdrop_event(bool override, bool skipable, bool compressable, float speed, int charcount, bool cont, int headcharattr);
+	void add_delay_event(bool override, bool skippable, bool compressable, int duration);
+	void add_clear_event(bool override, bool skippable, bool compressable);
+	void add_setattr_event(bool override, bool skippable, bool compressable, int newattrs);
+	void add_setattr_event(bool override, bool skippable, bool compressable, std::vector<int> & newattrvec);
+	void add_setstring_event(bool override, bool skippable, bool compressable, const char * newstr);
+	void add_stringfill_event(bool override, bool skippable, bool compressable);
+	void add_stringdrop_event(bool override, bool skippable, bool compressable, float speed, int charcount, bool cont, int headcharattr);
 
 protected:
 	//// Internal functions

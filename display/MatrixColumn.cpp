@@ -48,8 +48,8 @@ void MatrixColumn::render(Screen * curscr)
 	// Is there anything in the queue?
 	while (!terminate && !_equeue.empty())
 	{
-		// Get to the next unskipable uncompressable or last event
-		while (((_equeue.front()->_skipable) ||
+		// Get to the next unskippable uncompressable or last event
+		while (((_equeue.front()->_skippable) ||
 					(_equeue.front()->_compressable)) &&
 				(_equeue.front() != _equeue.back()))
 		{
@@ -101,7 +101,7 @@ void MatrixColumn::add_multitone_stringdrop_script(std::vector<float> & speeds,
 	{
 		// Put in SA event
 		MCE_SetAttr * newsa = new MCE_SetAttr(colattrs[i]);
-		newsa->_skipable = false;
+		newsa->_skippable = false;
 		newsa->_compressable = false;
 		eventlist.push_back(newsa);
 		
@@ -111,12 +111,12 @@ void MatrixColumn::add_multitone_stringdrop_script(std::vector<float> & speeds,
 			 counts[i], 
 			 true,
 			 headattrs[i]);
-		newsd->_skipable = false;
+		newsd->_skippable = false;
 		newsd->_compressable = false;
 		eventlist.push_back(newsd);
 	}
 	MCE_RepScript * newe = new MCE_RepScript(eventlist);
-	newe->_skipable = true;
+	newe->_skippable = true;
 	newe->_compressable = false;
 
 	add_event(newe);
@@ -124,10 +124,10 @@ void MatrixColumn::add_multitone_stringdrop_script(std::vector<float> & speeds,
 
 //// Functions to add new events to the matrixcolumn event queue
 
-void MatrixColumn::add_delay_event(bool override, bool skipable, bool compressable, int duration)
+void MatrixColumn::add_delay_event(bool override, bool skippable, bool compressable, int duration)
 {
 	MCE_Delay * newe = new MCE_Delay(duration);
-	newe->_skipable = skipable;
+	newe->_skippable = skippable;
 	newe->_compressable = compressable; // Meaningless for this event
 
 	if (override)
@@ -138,10 +138,10 @@ void MatrixColumn::add_delay_event(bool override, bool skipable, bool compressab
 	}
 }
 
-void MatrixColumn::add_clear_event(bool override, bool skipable, bool compressable)
+void MatrixColumn::add_clear_event(bool override, bool skippable, bool compressable)
 {
 	MCE_Clear * newe = new MCE_Clear();
-	newe->_skipable = skipable;
+	newe->_skippable = skippable;
 	newe->_compressable = compressable; // Meaningless for this event
 
 	if (override)
@@ -152,10 +152,10 @@ void MatrixColumn::add_clear_event(bool override, bool skipable, bool compressab
 	}
 }
 
-void MatrixColumn::add_setattr_event(bool override, bool skipable, bool compressable, int newattrs)
+void MatrixColumn::add_setattr_event(bool override, bool skippable, bool compressable, int newattrs)
 {
 	MCE_SetAttr * newe = new MCE_SetAttr(newattrs);
-	newe->_skipable = skipable;
+	newe->_skippable = skippable;
 	newe->_compressable = compressable; // Meaningless for this event
 
 	if (override)
@@ -166,10 +166,10 @@ void MatrixColumn::add_setattr_event(bool override, bool skipable, bool compress
 	}
 }
 
-void MatrixColumn::add_setattr_event(bool override, bool skipable, bool compressable, std::vector<int> & newattrvec)
+void MatrixColumn::add_setattr_event(bool override, bool skippable, bool compressable, std::vector<int> & newattrvec)
 {
 	MCE_SetAttr * newe = new MCE_SetAttr(newattrvec);
-	newe->_skipable = skipable;
+	newe->_skippable = skippable;
 	newe->_compressable = compressable; // Meaningless for this event
 
 	if (override)
@@ -180,10 +180,10 @@ void MatrixColumn::add_setattr_event(bool override, bool skipable, bool compress
 	}
 }
 
-void MatrixColumn::add_setstring_event(bool override, bool skipable, bool compressable, const char * newstr)
+void MatrixColumn::add_setstring_event(bool override, bool skippable, bool compressable, const char * newstr)
 {
 	MCE_SetString * newe = new MCE_SetString(newstr);
-	newe->_skipable = skipable;
+	newe->_skippable = skippable;
 	newe->_compressable = compressable; // Meaningless for this event
 
 	if (override)
@@ -194,10 +194,14 @@ void MatrixColumn::add_setstring_event(bool override, bool skipable, bool compre
 	}
 }
 
-void MatrixColumn::add_stringfill_event(bool override, bool skipable, bool compressable)
+/**
+ * Fill the entire column with the current string and pad with spaces
+ * Will set attr for every row in the column
+ */
+void MatrixColumn::add_stringfill_event(bool override, bool skippable, bool compressable)
 {
 	MCE_StringFill * newe = new MCE_StringFill();
-	newe->_skipable = skipable;
+	newe->_skippable = skippable;
 	newe->_compressable = compressable; // Meaningless for this event
 
 	if (override)
@@ -208,10 +212,10 @@ void MatrixColumn::add_stringfill_event(bool override, bool skipable, bool compr
 	}
 }
 
-void MatrixColumn::add_stringdrop_event(bool override, bool skipable, bool compressable, float speed, int charcount, bool cont, int headcharattr)
+void MatrixColumn::add_stringdrop_event(bool override, bool skippable, bool compressable, float speed, int charcount, bool cont, int headcharattr)
 {
 	MCE_StringDrop * newe = new MCE_StringDrop(speed, charcount, cont, headcharattr);
-	newe->_skipable = skipable;
+	newe->_skippable = skippable;
 	newe->_compressable = compressable;
 
 	if (override)
