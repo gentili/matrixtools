@@ -82,7 +82,7 @@ public:
 	void curs_addch(char ch)	{ waddch(_stdscr, ch); }
 	void curs_mvaddch(int y, int x, char ch)
 					{ mvwaddch(_stdscr, y, x, ch); }
-	void curs_mvaddstr(int y, int x, char * str)
+	void curs_mvaddstr(int y, int x, const char * str)
 					{ mvwaddstr(_stdscr, y, x, str); }
 	void curs_mvchgat(int y, int x, int n, int newattr)
 					{ mvwchgat(_stdscr, y, x, n, static_cast<attr_t>(newattr), 0, NULL); }
