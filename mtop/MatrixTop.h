@@ -7,7 +7,7 @@
 #include <proc/readproc.h>
 
 // Local includes
-#include "MatrixColumn.h"
+#include "display/MatrixColumn.h"
 
 class Proc {
 public:

@@ -8,12 +8,15 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
                  Makefile
                  display/Makefile
+                 mtop/Makefile
                  ])
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_RANLIB
+AC_LANG([C++])
+AX_CXX_COMPILE_STDCXX_11
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lncurses':

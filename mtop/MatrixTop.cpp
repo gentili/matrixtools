@@ -12,8 +12,8 @@
 #include <proc/escape.h>
 
 // Local Includes
-#include "Screen.h"
-#include "MatrixColumn.h"
+#include "display/Screen.h"
+#include "display/MatrixColumn.h"
 #include "MatrixTop.h"
 
 MatrixTop::MatrixTop()
